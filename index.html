@@ -11,6 +11,7 @@
         @media (prefers-color-scheme: dark) {
             :root {
                 --color-primary: white;
+                --color-background: black;
 
             }
         }
@@ -18,8 +19,16 @@
         @media (prefers-color-scheme: light) {
             :root {
                 --color-primary: black;
+                --color-background: white;
 
             }
+        }
+    </style>
+    <style name="body">
+        body {
+            background-color: var(--color-background);
+            color: var(--color-primary);
+            font-family: sans-serif;
         }
     </style>
 
@@ -54,7 +63,9 @@
 
 
         .navigation.main a[href]:hover {
-            border: 1px solid var(--color-primary);
+            background-color: var(--color-primary);
+            
+            color: var(--color-background);
         }
     </style>
 </head>
