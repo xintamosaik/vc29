@@ -30,9 +30,7 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 	// Process form data
 	title := r.FormValue("title")
 	description := r.FormValue("description")
-	
 	content := r.FormValue("content")
-	log.Println("Content:", content)
 
 	intelData := IntelJSON{
 		Title:       title,
@@ -52,10 +50,8 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Failed to create data/intel directory: %v", err)
 	}
 
-	// Create a unix timestamp for a unique filename
-
-	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	// save as JSON file with timestamp converted to string
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	fileName := directory + "/" + timestamp + ".json"
 	file, err := os.Create(fileName)
 	if err != nil {
@@ -64,6 +60,7 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
+
 	encoder := json.NewEncoder(file)
 	if err := encoder.Encode(intelData); err != nil {
 		http.Error(w, "Failed to encode JSON", http.StatusInternalServerError)
@@ -71,8 +68,8 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("Intel data saved to", fileName)
-
-
+	
+	// Respond 
 	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusOK)
 
