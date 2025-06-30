@@ -7,4 +7,3 @@
 - probably tailwind
 - maybe typescript or jsdoc as a ts replacement
 - maybe air
-

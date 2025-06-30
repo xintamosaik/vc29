@@ -1,12 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
-    <title>{{.Title}}</title>
+    <title>VC28</title>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
 </head>
+
 <body>
-    {{.Content}}
+    <nav>
+        <ul style="display: flex; list-style: none; gap: 10px; padding-inline-start: 0px;">
+            <li><a href="/home" hx-get="/home" hx-swap="innerHTML" hx-target="#root">Home</a></li>
+            <li><a href="/about" hx-get="/about" hx-swap="innerHTML" hx-target="#root">About</a></li>
+            <li><a href="/contact" hx-get="/contact" hx-swap="innerHTML" hx-target="#root">Contact</a></li>
+        </ul>
+    </nav>
+
+    <main id="root"></main>
 </body>
+
 </html>

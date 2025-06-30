@@ -2,26 +2,32 @@ package main
 
 import (
 	"fmt"
-	"html/template"
+
 	"log"
 	"net/http"
+
+	"github.com/a-h/templ"
+	"github.com/xintamosaik/vc29/home"
+		"github.com/xintamosaik/vc29/about"
+			"github.com/xintamosaik/vc29/contact"
 )
+
 const port = ":3000"
 
-type PageData struct {
-	Title string
-	Content string
-}
-
 func main() {
-	tmpl := template.Must(template.ParseFiles("index.html"))
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		data := PageData{
-			Title:   "Hello World",
-			Content: "Welcome to the world of web development. Enjoy coding!",
-		}
-		tmpl.Execute(w, data)
+		http.ServeFile(w, r, "index.html")
 	})
+
+	// HTMX handlers:
+	// HTMX handler for GET /home
+	http.Handle("/home", templ.Handler(home.Index()))
+	// HTMX handler for GET /about
+	http.Handle("/about", templ.Handler(about.Index()))
+	
+	// HTMX handler for GET /contact
+	http.Handle("/contact", templ.Handler(contact.Index()))
 
 	fmt.Println("Starting server on http://localhost" + port)
 	if err := http.ListenAndServe(port, nil); err != nil {
