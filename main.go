@@ -7,12 +7,12 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
-	"github.com/xintamosaik/vc29/home"
-	"github.com/xintamosaik/vc29/intel"
-	"github.com/xintamosaik/vc29/drafts"
-	"github.com/xintamosaik/vc29/signals"
 	"github.com/xintamosaik/vc29/about"
 	"github.com/xintamosaik/vc29/contact"
+	"github.com/xintamosaik/vc29/drafts"
+	"github.com/xintamosaik/vc29/home"
+	"github.com/xintamosaik/vc29/intel"
+	"github.com/xintamosaik/vc29/signals"
 )
 
 const port = ":3000"
