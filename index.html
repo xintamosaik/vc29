@@ -7,42 +7,61 @@
     <meta name="color-scheme" content="light dark">
     <title>VC28</title>
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
-   	<style name="colors">
+    <style name="colors">
         @media (prefers-color-scheme: dark) {
             :root {
-                --color-primary: black;
+                --color-primary: white;
+
             }
         }
 
         @media (prefers-color-scheme: light) {
             :root {
                 --color-primary: black;
+
             }
         }
     </style>
+
     <style name="navigation">
         .navigation.main {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
+            margin-bottom: 4rem;
         }
 
         .navigation.main a {
+            text-decoration: none;
             padding: 2ch;
         }
 
         .navigation.main a {
-            border: 1px solid transparent;
+            border: 1px solid var(--color-primary);
+            cursor:default;
+            user-select: none;
         }
 
-        .navigation.main a[href]:visited {
+        .navigation.main a[href] {
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+
+        .navigation.main a[href] {
+            color: var(--color-primary);
+        }
+
+
+        .navigation.main a[href]:hover {
             border: 1px solid var(--color-primary);
         }
     </style>
 </head>
 
 <body>
-    <main id="root" hx-trigger="load" hx-get="/home" hx-swap="innerHTML" style="width: min(60ch, 100%); margin: 0 auto;"></main>
+    <main id="root" hx-trigger="load" hx-get="/home" hx-swap="innerHTML"
+        style="width: min(60ch, 100%); margin: 0 auto;"></main>
 </body>
 
 </html>
