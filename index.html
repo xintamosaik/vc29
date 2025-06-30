@@ -31,6 +31,18 @@
             font-family: sans-serif;
         }
     </style>
+    <style name="forms">
+        label {
+            display: block;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        input, textarea {
+            width: 100%;
+            margin-bottom: 1rem;
+            padding: 2ch;
+        }
+    </style>
 
     <style name="navigation">
         .navigation.main {
@@ -71,7 +83,7 @@
 </head>
 
 <body>
-    <main id="root" hx-trigger="load" hx-get="/home" hx-swap="innerHTML"
+    <main id="root" hx-trigger="load" hx-get="/intel/new" hx-swap="innerHTML"
         style="width: min(60ch, 100%); margin: 0 auto;"></main>
 </body>
 
