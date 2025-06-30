@@ -15,15 +15,14 @@ var routes = []Route{
 }
 
 templ Main(active string) {
-	<nav>
-		<ul style="display: flex; list-style: none; gap: 10px; padding-inline-start: 0px;">
-			for _, route := range routes {
-				if route.Path == active {
-					@Unlink(route.Title)
-				} else {
-					@Link("/"+route.Path, route.Title)
-				}
+
+	<nav class="navigation main">
+		for _, route := range routes {
+			if route.Path == active {
+				@Unlink(route.Title)
+			} else {
+				@Link("/"+route.Path, route.Title)
 			}
-		</ul>
+		}
 	</nav>
 }
