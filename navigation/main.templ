@@ -1,15 +1,43 @@
 package navigation
 
-templ Main() {
+templ Main(active string) {
 <nav>
     <ul style="display: flex; list-style: none; gap: 10px; padding-inline-start: 0px;">
+        if "home" == active {
+            @Unlink("Home")
+        } else {
+            @Link("/home", "Home")
+        }
         
-        @Link("/home", "Home")
-        @Link("/intel", "Intel")
-        @Link("/drafts", "Drafts")
-        @Link("/signals", "Signals")
-        @Link("/about", "About")
-        @Link("/contact", "Contact")
+        if "signals" == active {
+            @Unlink("Signals")
+        } else {
+            @Link("/signals", "Signals")
+        }
+
+        if "about" == active {
+            @Unlink("About")
+        } else {
+            @Link("/about", "About")
+        }
+
+        if "contact" == active {
+            @Unlink("Contact")
+        } else {
+            @Link("/contact", "Contact")
+        }
+
+        if "drafts" == active {
+            @Unlink("Drafts")
+        } else {
+            @Link("/drafts", "Drafts")
+        }
+    
+        if "intel" == active {
+            @Unlink("Intel")
+        } else {
+            @Link("/intel", "Intel")
+        }
 
     </ul>
 </nav>
