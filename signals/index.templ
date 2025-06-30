@@ -1,8 +1,14 @@
 package signals
 
+import (
+"github.com/xintamosaik/vc29/navigation"
+)
+
 templ Index() {
-    <h1>Signals</h1>
-    <p>
-        This is the Signals page for our web application. Here you can find information about the latest features, updates, and technologies used in the project.
-    </p>
+@navigation.Main()
+<h1>Signals</h1>
+<p>
+    This is the Signals page for our web application. Here you can find information about the latest features, updates,
+    and technologies used in the project.
+</p>
 }

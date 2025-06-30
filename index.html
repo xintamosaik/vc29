@@ -10,18 +10,7 @@
 </head>
 
 <body>
-    <nav>
-        <ul style="display: flex; list-style: none; gap: 10px; padding-inline-start: 0px;">
-            <li><a href="/home" hx-get="/home" hx-swap="innerHTML" hx-target="#root">Home</a></li>
-            <li><a href="/intel" hx-get="/intel" hx-swap="innerHTML" hx-target="#root">Intel</a></li>
-            <li><a href="/drafts" hx-get="/drafts" hx-swap="innerHTML" hx-target="#root">Drafts</a></li>
-            <li><a href="/signals" hx-get="/signals" hx-swap="innerHTML" hx-target="#root">Signals</a></li>
-            <li><a href="/about" hx-get="/about" hx-swap="innerHTML" hx-target="#root">About</a></li>
-            <li><a href="/contact" hx-get="/contact" hx-swap="innerHTML" hx-target="#root">Contact</a></li>
-        </ul>
-    </nav>
-
-    <main id="root"></main>
+    <main id="root" hx-trigger="load" hx-get="/home" hx-swap="innerHTML"></main>
 </body>
 
 </html>
