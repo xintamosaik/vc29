@@ -1,13 +1,9 @@
 package intel
-import (
-"github.com/xintamosaik/vc29/navigation"
-)
+
+import "github.com/xintamosaik/vc29/navigation"
 
 templ Index() {
-@navigation.Main("intel")
-<h1>Intel</h1>
-<p>
-    This is the Intel page for our web application. Here you can find information about the latest features, updates,
-    and technologies used in the project.
-</p>
+	@navigation.Main("intel")
+    @navigation.Link("/intel/new", "Add new intel")
+	
 }

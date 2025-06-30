@@ -26,6 +26,7 @@ func main() {
 	// HTMX handlers:
 	http.Handle("/home", templ.Handler(home.Index()))
 	http.Handle("/intel", templ.Handler(intel.Index()))
+	http.Handle("/intel/new", templ.Handler(intel.New()))
 	http.Handle("/drafts", templ.Handler(drafts.Index()))
 	http.Handle("/signals", templ.Handler(signals.Index()))
 	http.Handle("/about", templ.Handler(about.Index()))
