@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-
+	"os"
 	"log"
 	"net/http"
 
@@ -18,6 +18,13 @@ import (
 const port = ":3000"
 
 func main() {
+
+	// Housekeeping: Create a data directory if it doesn't exist
+	if err :=  os.MkdirAll("data", 0755); err != nil {
+		log.Fatalf("Failed to create data directory: %v", err)
+	}
+
+
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "index.html")

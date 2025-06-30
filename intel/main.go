@@ -3,6 +3,8 @@ package intel
 import (
 	"encoding/json"
 	"log"
+	"time"
+	"strconv"
 	"net/http"
 	"os"
 	"strings"
@@ -44,8 +46,17 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 		intelData.Content = append(intelData.Content, words)
 	}
 
-	// save as JSON file
-	fileName := "intel.json"
+	// Add the data/intel directory
+	directory := "data/intel"
+	if err := os.MkdirAll(directory, 0755); err != nil {
+		log.Fatalf("Failed to create data/intel directory: %v", err)
+	}
+
+	// Create a unix timestamp for a unique filename
+
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	// save as JSON file with timestamp converted to string
+	fileName := directory + "/" + timestamp + ".json"
 	file, err := os.Create(fileName)
 	if err != nil {
 		http.Error(w, "Failed to create file", http.StatusInternalServerError)
