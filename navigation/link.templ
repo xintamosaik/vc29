@@ -1,0 +1,9 @@
+package navigation
+
+templ Link(href string, title string) {
+    <li>
+        <a href={href} hx-get={href} hx-swap="innerHTML" hx-target="#root">
+            {title}
+        </a>
+    </li>
+}
