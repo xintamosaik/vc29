@@ -8,7 +8,7 @@ templ New() {
     <p>
         This is the form to add new intel to our web application. Please fill out the necessary details and submit.
     </p>
-    <form action="/intel/create" hx-method="post" method="post">
+    <form action="/intel/create" method="post" hx-target="#root" hx-swap="innerHTML" hx-trigger="submit" hx-post="/intel/create">
         <label for="title">Title:</label>
         <input type="text" id="title" name="title" required>
         <br />

@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"context"
+
 )
 
 
@@ -23,32 +25,24 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("New intel submitted")
 
-	// Form data
+	// Process form data
 	title := r.FormValue("title")
-	log.Println("Title:", title)
 	description := r.FormValue("description")
-	log.Println("Description:", description)
-
+	
 	content := r.FormValue("content")
 	log.Println("Content:", content)
-	// Create IntelJSON object
+
 	intelData := IntelJSON{
 		Title:       title,
 		Description: description,
 		Content: make([][]string, 0),
 	}
-	// We will split the content into lines and the lines into words.
+
 	lines := strings.Split(content, "\n")
 	for _, line := range lines {
-		
-		words := strings.Fields(strings.TrimSpace(line))  // Split line into words
-		
+		words := strings.Fields(strings.TrimSpace(line)) 
 		intelData.Content = append(intelData.Content, words)
-
 	}
-	log.Println("Content lines:", lines)
-
-	log.Println("Intel data:", intelData)
 
 	// save as JSON file
 	fileName := "intel.json"
@@ -66,5 +60,16 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("Intel data saved to", fileName)
+
+
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(http.StatusOK)
+
+	err = Index().Render(context.Background(), w)
+	if err != nil {
+		http.Error(w, "Failed to render intel page", http.StatusInternalServerError)
+		log.Println("Error rendering intel page:", err)
+		return
+	}
 
 }
