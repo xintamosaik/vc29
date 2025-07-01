@@ -2,8 +2,19 @@ package intel
 
 import "github.com/xintamosaik/vc29/navigation"
 
-templ Index() {
+templ Index(intel []IntelShort) {
 	@navigation.Main("intel")
     @navigation.Link("/intel/new", "Add new intel")
+ 
+    
+    <ul>
+        for _, item := range intel {
+            <li>
+                { item.CreatedAt } - { item.Title } - { item.Description }
+                
+            </li>
+        }
+    </ul>
+
 	
 }

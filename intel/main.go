@@ -1,22 +1,28 @@
 package intel
 
 import (
+	"context"
 	"encoding/json"
 	"log"
-	"time"
-	"strconv"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
-	"context"
-
+	"time"
 )
 
+const directory = "data/intel"
 
 type IntelJSON struct {
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	Content     [][]string`json:"content"`
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	Content     [][]string `json:"content"`
+}
+
+type IntelShort struct {
+	CreatedAt   string
+	Title       string
+	Description string
 }
 
 func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
@@ -35,17 +41,16 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 	intelData := IntelJSON{
 		Title:       title,
 		Description: description,
-		Content: make([][]string, 0),
+		Content:     make([][]string, 0),
 	}
 
 	lines := strings.SplitSeq(content, "\n")
 	for line := range lines {
-		words := strings.Fields(strings.TrimSpace(line)) 
+		words := strings.Fields(strings.TrimSpace(line))
 		intelData.Content = append(intelData.Content, words)
 	}
 
 	// Add the data/intel directory
-	directory := "data/intel"
 	if err := os.MkdirAll(directory, 0755); err != nil {
 		log.Fatalf("Failed to create data/intel directory: %v", err)
 	}
@@ -68,16 +73,87 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("Intel data saved to", fileName)
-	
-	// Respond 
+
+	// Respond
 	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusOK)
 
-	err = Index().Render(context.Background(), w)
+	intelShorts, err := getAllIntelShorts()
+	if err != nil {
+		http.Error(w, "Failed to read intel file", http.StatusInternalServerError)
+		log.Println("Error reading intel file:", err)
+		return
+	}
+
+	err = Index(intelShorts).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render intel page", http.StatusInternalServerError)
 		log.Println("Error rendering intel page:", err)
 		return
 	}
 
+}
+
+func readIntelFile(fileName string) (IntelShort, error) {
+
+	file, err := os.Open(fileName)
+	if err != nil {
+		return IntelShort{}, err
+	}
+	defer file.Close()
+
+	var intel IntelJSON
+	var intelShort IntelShort
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&intel); err != nil {
+
+		return IntelShort{}, err
+	}
+
+	intelShort.Description = intel.Description
+	intelShort.Title = intel.Title
+	intelShort.CreatedAt = strings.TrimSuffix(file.Name(), ".json")
+
+	return intelShort, nil
+}
+
+func getAllIntelShorts() ([]IntelShort, error) {
+	files, err := os.ReadDir(directory)
+	if err != nil {
+		return nil, err
+	}
+
+	intels := make([]IntelShort, 0, len(files))
+
+	for _, file := range files {
+		if !file.IsDir() {
+			intel, err := readIntelFile(directory + "/" + file.Name())
+			if err != nil {
+				log.Printf("Error reading file %s: %v", file.Name(), err)
+				continue
+			}
+			intels = append(intels, intel)
+		}
+	}
+
+	return intels, nil
+}
+
+func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
+
+	log.Println("Handling Intel index page")
+
+	intelShorts, err := getAllIntelShorts()
+	if err != nil {
+		http.Error(w, "Failed to read intel files", http.StatusInternalServerError)
+		log.Println("Error reading intel files:", err)
+		return
+	}
+
+	err = Index(intelShorts).Render(context.Background(), w)
+	if err != nil {
+		http.Error(w, "Failed to render intel page", http.StatusInternalServerError)
+		log.Println("Error rendering intel page:", err)
+		return
+	}
 }

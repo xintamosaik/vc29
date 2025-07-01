@@ -32,7 +32,7 @@ func main() {
 
 	// HTMX handlers:
 	http.Handle("/home", templ.Handler(home.Index()))
-	http.Handle("/intel", templ.Handler(intel.Index()))
+	http.HandleFunc("/intel", intel.HandleIntelIndex)
 	http.Handle("/intel/new", templ.Handler(intel.New()))
 	http.HandleFunc("/intel/create",intel.HandleNewIntel)
 	http.Handle("/drafts", templ.Handler(drafts.Index()))
