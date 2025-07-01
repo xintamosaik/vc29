@@ -25,6 +25,17 @@ type IntelShort struct {
 	Description string
 }
 
+// This function handles the submission of new intel data.
+// It processes the form data, creates a new IntelJSON object,
+// saves it as a JSON file in the data/intel directory, and then renders the Intel index page.
+// If the request method is not POST, it responds with a "Method not allowed" error.
+//
+// It also handles errors related to file creation, encoding, and rendering the page.
+// If any error occurs, it logs the error and responds with an appropriate HTTP status code.
+//
+// The function expects the form data to contain "title", "description", and "content"
+// fields, where "content" is a multiline string that will be split into words and stored
+// as a slice of strings in the IntelJSON object.
 func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -94,6 +105,11 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// readIntelFile reads a JSON file from the data/intel directory,
+// parses it into an IntelJSON struct, and returns an IntelShort struct
+// containing the title, description, and createdAt fields.
+//
+// It returns an error if the file cannot be read or parsed.
 func readIntelFile(fileName string) (IntelShort, error) {
 
 	file, err := os.Open(fileName)
@@ -110,13 +126,21 @@ func readIntelFile(fileName string) (IntelShort, error) {
 		return IntelShort{}, err
 	}
 
+	trimmedFileName := strings.TrimSuffix(fileName, ".json")
+	fileNameOnly := strings.TrimPrefix(trimmedFileName, directory+"/") // Whhich is a unix time stamp
+	
+	intelShort.CreatedAt =fileNameOnly 
 	intelShort.Description = intel.Description
 	intelShort.Title = intel.Title
-	intelShort.CreatedAt = strings.TrimSuffix(file.Name(), ".json")
 
 	return intelShort, nil
 }
 
+// getAllIntelShorts reads all intel files from the data/intel directory,
+// parses them into IntelShort objects, and returns a slice of these objects.
+// If an error occurs during reading or parsing, it logs the error and continues with the next file.
+//
+// It returns a slice of IntelShort objects and an error if any.
 func getAllIntelShorts() ([]IntelShort, error) {
 	files, err := os.ReadDir(directory)
 	if err != nil {
@@ -139,6 +163,11 @@ func getAllIntelShorts() ([]IntelShort, error) {
 	return intels, nil
 }
 
+// HandleIntelIndex handles the request for the Intel index page.
+// It reads all intel files, creates a list of IntelShort objects,
+// and renders the index template with the list.
+//
+// If an error occurs during reading or rendering, it responds with an error message.
 func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Handling Intel index page")
@@ -156,4 +185,22 @@ func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error rendering intel page:", err)
 		return
 	}
+}
+
+// stampToDate converts a timestamp string to a formatted date string.
+// It expects the timestamp to be in seconds since the Unix epoch.
+// The returned date is formatted as "2006-01-02 15:04:05".
+//
+// Example: "1633072800" -> "2021-10-01 00:00:00"
+//
+// If the input is not a valid timestamp, it returns an error.
+func stampToDate(fileNameOnly string) (string, error) {
+	timestamp, err := strconv.ParseInt(fileNameOnly, 10, 64)
+		if err != nil {
+		return "", err
+	}
+
+	date := time.Unix(timestamp, 0)
+
+	return date.Format("2006-01-02 15:04:05"), nil
 }
