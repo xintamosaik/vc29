@@ -7,6 +7,12 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
 
+  // src.css
+  var init_src = __esm({
+    "src.css"() {
+    }
+  });
+
   // intel/annotate.js
   function AnnotationScript(event) {
     const selection = window.getSelection();
@@ -35,6 +41,7 @@
   // src.js
   var require_src = __commonJS({
     "src.js"() {
+      init_src();
       init_annotate();
       window.handleAnnotateMouseUp = AnnotationScript;
     }

@@ -1,0 +1,15 @@
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-primary: white;
+        --color-background: black;
+
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --color-primary: black;
+        --color-background: white;
+
+    }
+}

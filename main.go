@@ -25,6 +25,7 @@ func main() {
 		log.Fatalf("Failed to create data directory: %v", err)
 	}
 	result := api.Build(api.BuildOptions{
+		
 		EntryPoints:       []string{"src.js"},
 		Outfile:           "dist.js",
 		Bundle:            true,
@@ -35,6 +36,9 @@ func main() {
 		MinifyWhitespace:  false,
 		MinifyIdentifiers: false,
 		MinifySyntax:      false,
+		Loader: map[string]api.Loader{
+			".css": api.LoaderCSS,
+		},
 	})
 
 	if len(result.Errors) > 0 {
@@ -44,9 +48,13 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "index.html")
 	})
-
+	// js bundle
 	http.HandleFunc("GET /dist.js", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "dist.js")
+	})
+	// css bundle
+	http.HandleFunc("GET /dist.css", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "dist.css")
 	})
 	// HTMX handlers:
 	http.Handle("/home", templ.Handler(home.Index()))
