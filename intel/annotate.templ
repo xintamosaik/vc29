@@ -11,6 +11,7 @@ templ IntelParagraph(line []string) {
 }
 
 templ Annotate(intelFull IntelFull) {
+
 	@navigation.Main("")
 	<h2>
 		<span>
@@ -26,7 +27,7 @@ templ Annotate(intelFull IntelFull) {
 	<h4 id="description">
 		{ intelFull.Description }
 	</h4>
-	<div id="content">
+	<div id="content" onmouseup="handleAnnotateMouseUp(event)">
 		for index, section := range intelFull.Content {
 			<p data-paragraph={ index }>
 				if len(section) == 0 {

@@ -41,6 +41,9 @@ func main() {
 	http.Handle("/about", templ.Handler(about.Index()))
 	http.Handle("/contact", templ.Handler(contact.Index()))
 
+	// Static file server for assets
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
 	fmt.Println("Starting server on http://localhost" + port)
 	if err := http.ListenAndServe(port, nil); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
