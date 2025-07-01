@@ -3,18 +3,76 @@ package intel
 import "github.com/xintamosaik/vc29/navigation"
 
 templ Index(intel []IntelShort) {
-	@navigation.Main("intel")
-    @navigation.Link("/intel/new", "Add new intel")
- 
-    
-    <ul>
-        for _, item := range intel {
-            <li>
-                { item.CreatedAt } - { item.Title } - { item.Description }
-                
-            </li>
+	<style>
+        #intel_list {
+            display: flex;
+            flex-direction: column;
+          
+            gap: 2rem;
         }
-    </ul>
 
-	
+        #intel_list .item {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: stretch;
+            outline: 1px solid transparent;
+            outline-offset: 1ch;
+        }
+
+        #intel_list .item:hover {
+            outline: 1px solid var(--color-primary);
+        }
+
+        #intel_list .item .short {
+            flex-grow: 1;
+        }
+        
+        #intel_list .item .actions {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        #intel_list .item .actions a {
+            text-align: right;
+            display: block;
+            flex-grow: 1;
+            cursor: pointer;
+            text-decoration:none;
+            text-transform: uppercase;
+        }
+
+        #intel_list .item .actions a:hover {
+            text-decoration: underline;
+        }
+    </style>
+	@navigation.Main("intel")
+	@navigation.Link("/intel/new", "Add new intel")
+	<br/>
+	<br/>
+	for _, item := range intel {
+		<div id="intel_list">
+			<div class="item">
+				<div class="short">
+					<h2>
+						{ item.Title }
+					</h2>
+					<h3>
+						{ item.Description }
+					</h3>
+					<p>
+						{ stampToDate(item.CreatedAt) }
+					</p>
+				</div>
+				<div class="actions">
+					@navigation.Link("/intel/view/"+item.CreatedAt, "view")
+                    @navigation.Link("/intel/annotate/"+item.CreatedAt, "annotate")
+                    @navigation.Link("/intel/delete/"+item.CreatedAt, "delete")
+				</div>
+			</div>
+		</div>
+	}
 }
