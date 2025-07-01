@@ -38,8 +38,8 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 		Content: make([][]string, 0),
 	}
 
-	lines := strings.Split(content, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(content, "\n")
+	for line := range lines {
 		words := strings.Fields(strings.TrimSpace(line)) 
 		intelData.Content = append(intelData.Content, words)
 	}
