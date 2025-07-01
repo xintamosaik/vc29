@@ -1,0 +1,100 @@
+package intel
+
+import "github.com/xintamosaik/vc29/navigation"
+
+//type IntelFull struct {
+//    CreatedAt   string
+//    Title       string
+//    Description string
+//    Content     [][]string
+//}
+templ IntelParagraph(line []string) {
+	for index, part := range line {
+		<span data-word={ index }>{ part + " "}</span>
+		
+	}
+}
+
+templ Annotate(intelFull IntelFull) {
+	@navigation.Main("")
+	<h2>
+		<span>
+			Annotate Intel:
+		</span>
+		<span id="title">
+			{ intelFull.Title }
+		</span>
+	</h2>
+	<h3 id="created_at">
+		{ intelFull.CreatedAt }
+	</h3>
+	<h4 id="description">
+		{ intelFull.Description }
+	</h4>
+	<div id="content">
+		for index, section := range intelFull.Content {
+			<p data-paragraph={ index }>
+				if len(section) == 0 {
+					<span data-word="0"> </span>
+				} else {
+					@IntelParagraph(section)
+				}
+			</p>
+		}
+	</div>
+    <div id="send_annotation" popover>
+        <form hx-target="#root" hx-swap="innerHTML" hx-post={ "/intel/annotate/ "+ intelFull.CreatedAt }>
+            <h2>Add Annotation</h2>
+            <input type="text" name="content" readonly>
+            <input type="first_word" name="first_word" readonly>
+            <input type="last_word" name="last_word" readonly>
+            <input type="start_paragraph" name="start_paragraph" readonly>
+            <input type="end_paragraph" name="end_paragraph" readonly>
+            <input type="start_word" name="start_word" readonly>
+            <input type="end_word" name="end_word" readonly>
+            <input type="text" name="keywords" placeholder="Keywords (comma separated)" required>
+          
+            <br />
+            <button type="submit">Submit Annotation</button>
+            <button type="button">Close</button>
+
+        </form>
+    </div>
+
+    
+    <script>
+        const intel_content = document.querySelector("#content");
+        // This is for marking text
+        intel_content.addEventListener("mouseup", (e) => {
+            const selection = window.getSelection();
+            if (!selection || selection.isCollapsed) return;
+
+            const range = selection.getRangeAt(0);
+            console.log(range)
+
+            const start = range.startContainer
+            const startSpan = start.parentElement;
+            const startWord = startSpan.dataset.word;
+       
+            const startParagraph = startSpan.parentElement;
+            const startParagraphIndex = startParagraph.dataset.paragraph;
+       
+
+            const end = range.endContainer
+            const endSpan = end.parentElement;
+            const endParagraph = endSpan.parentElement;
+          
+            const endWord = endSpan.dataset.word;
+            const endParagraphIndex = endParagraph.dataset.paragraph;
+         
+            console.log("Selected text from paragraph", startParagraphIndex, "word", startWord, "to paragraph", endParagraphIndex, "word", endWord);
+
+            const popover = document.querySelector("#send_annotation");
+
+
+            popover.showPopover();
+
+
+        })
+    </script>
+}

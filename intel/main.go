@@ -13,16 +13,25 @@ import (
 
 const directory = "data/intel"
 
+// IntelJSON represents the structure of the intel data stored in JSON files.
 type IntelJSON struct {
 	Title       string     `json:"title"`
 	Description string     `json:"description"`
 	Content     [][]string `json:"content"`
 }
 
+// IntelShort is a simplified version of IntelJSON, where the content is not included.
 type IntelShort struct {
 	CreatedAt   string
 	Title       string
 	Description string
+}
+
+type IntelFull struct {
+	CreatedAt   string
+	Title       string
+	Description string
+	Content     [][]string
 }
 
 // This function handles the submission of new intel data.
@@ -105,12 +114,42 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// readIntelFile reads a JSON file from the data/intel directory,
+// getIntelFull reads a JSON file from the data/intel directory,
+// parses it into an IntelJSON struct, and returns an IntelFull struct
+// containing the createdAt, title, description, and content fields.
+//
+// It returns an error if the file cannot be read or parsed.
+func getIntelFull(fileName string) (IntelFull, error) {
+	file, err := os.Open(fileName)
+	if err != nil {
+		return IntelFull{}, err
+	}
+	defer file.Close()
+
+	var intel IntelJSON
+	var intelFull IntelFull
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&intel); err != nil {
+		return IntelFull{}, err
+	}
+
+	trimmedFileName := strings.TrimSuffix(fileName, ".json")
+	fileNameOnly := strings.TrimPrefix(trimmedFileName, directory+"/") // Whhich is a unix time stamp
+
+	intelFull.CreatedAt = fileNameOnly
+	intelFull.Description = intel.Description
+	intelFull.Title = intel.Title
+	intelFull.Content = intel.Content
+
+	return intelFull, nil
+}
+
+// getIntelShort reads a JSON file from the data/intel directory,
 // parses it into an IntelJSON struct, and returns an IntelShort struct
 // containing the title, description, and createdAt fields.
 //
 // It returns an error if the file cannot be read or parsed.
-func readIntelFile(fileName string) (IntelShort, error) {
+func getIntelShort(fileName string) (IntelShort, error) {
 
 	file, err := os.Open(fileName)
 	if err != nil {
@@ -151,7 +190,7 @@ func getAllIntelShorts() ([]IntelShort, error) {
 
 	for _, file := range files {
 		if !file.IsDir() {
-			intel, err := readIntelFile(directory + "/" + file.Name())
+			intel, err := getIntelShort(directory + "/" + file.Name())
 			if err != nil {
 				log.Printf("Error reading file %s: %v", file.Name(), err)
 				continue
@@ -162,6 +201,7 @@ func getAllIntelShorts() ([]IntelShort, error) {
 
 	return intels, nil
 }
+
 
 // HandleIntelIndex handles the request for the Intel index page.
 // It reads all intel files, creates a list of IntelShort objects,
@@ -203,4 +243,31 @@ func stampToDate(fileNameOnly string) (string, error) {
 	date := time.Unix(timestamp, 0)
 
 	return date.Format("2006-01-02 15:04:05"), nil
+}
+
+// handleAnnotate is a view that gets an intel data and then allows users to add annotations to it.
+func HandleAnnotate( w http.ResponseWriter, r *http.Request) {
+	log.Println("Handling Intel annotation")
+
+	intelID := r.PathValue("id")
+	
+	if intelID == "" {
+		http.Error(w, "Intel ID is required", http.StatusBadRequest)
+		return
+	}
+	intelFull, err := getIntelFull(directory + "/" + intelID + ".json")
+	if err != nil {
+		http.Error(w, "Failed to read intel file", http.StatusInternalServerError)
+		log.Println("Error reading intel file:", err)
+		return
+	}
+	err = Annotate(intelFull).Render(context.Background(), w)
+	if err != nil {
+		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
+		log.Println("Error rendering annotation page:", err)
+		return
+	}
+
+	log.Println("Intel annotation page rendered successfully")
+
 }
