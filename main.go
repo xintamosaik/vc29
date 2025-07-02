@@ -24,6 +24,8 @@ func main() {
 	if err := os.MkdirAll("data", 0755); err != nil {
 		log.Fatalf("Failed to create data directory: %v", err)
 	}
+
+	// Bundle the JavaScript and CSS files using esbuild
 	result := api.Build(api.BuildOptions{
 		
 		EntryPoints:       []string{"src.js"},
@@ -45,29 +47,43 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Static files: html
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "index.html")
 	})
-	// js bundle
+
+	// Static files: js bundle
 	http.HandleFunc("GET /dist.js", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "dist.js")
 	})
-	// css bundle
+
+	// Static files: css bundle
 	http.HandleFunc("GET /dist.css", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "dist.css")
 	})
-	// HTMX handlers:
+
+	// HTMX handlers: home
 	http.Handle("/home", templ.Handler(home.Index()))
+
+	// HTMX handlers: intel
 	http.HandleFunc("/intel", intel.HandleIntelIndex)
 	http.Handle("/intel/new", templ.Handler(intel.New()))
 	http.HandleFunc("POST /intel/create", intel.HandleNewIntel)
 	http.HandleFunc("GET /intel/annotate/{id}", intel.HandleAnnotate)
 	
+	// HTMX handlers: drafts
 	http.Handle("/drafts", templ.Handler(drafts.Index()))
+
+	// HTMX handlers: signals
 	http.Handle("/signals", templ.Handler(signals.Index()))
+
+	// HTMX handlers: about
 	http.Handle("/about", templ.Handler(about.Index()))
+
+	// HTMX handlers: contact
 	http.Handle("/contact", templ.Handler(contact.Index()))
 
+	// Start the HTTP server
 	fmt.Println("Starting server on http://localhost" + port)
 	if err := http.ListenAndServe(port, nil); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
