@@ -274,7 +274,6 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 }
 
 type Annotation struct {
-	IntelID        string `json:"intel_id"`
 	StartParagraph string `json:"start_paragraph"`
 	StartWord      string `json:"start_word"`
 	EndParagraph   string `json:"end_paragraph"`
@@ -309,7 +308,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		intelID, startParagraph, startWord, endParagraph, endWord, description) // And yes, that worked
 
 	// Create the annotations directory if it doesn't exist
-	if err := os.MkdirAll(directoryAnnotations, 0755); err != nil {
+	if err := os.MkdirAll(directoryAnnotations + "/" + intelID, 0755); err != nil {
 		http.Error(w, "Failed to create annotations directory", http.StatusInternalServerError)
 		log.Println("Error creating annotations directory:", err)
 		return
@@ -317,7 +316,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 
 	// We will use unix timestamps again for the annotation file name
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	annotationFileName := directoryAnnotations + "/" + intelID + "_" + timestamp + ".json"
+	annotationFileName := directoryAnnotations + "/" + timestamp + ".json"
 	annotationFile, err := os.Create(annotationFileName)
 	if err != nil {
 		http.Error(w, "Failed to create annotation file", http.StatusInternalServerError)
@@ -327,7 +326,6 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 	defer annotationFile.Close()
 
 	annotation := Annotation{
-		IntelID:        intelID,
 		StartParagraph: startParagraph,
 		StartWord:      startWord,
 		EndParagraph:   endParagraph,
@@ -370,7 +368,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 	// So we will actually load the annotations that already exist. And if one of them is only some minutes old, we will show something that 
 	// gives a hint about that. "Latest add: some minutes ago - keyword: something"
 	// Later though.
-	
+
 }
 
 // Register initializes the Intel handlers for the HTMX routes.
