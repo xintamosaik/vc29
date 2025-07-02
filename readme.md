@@ -1,12 +1,18 @@
 # readme
 
-- SPA
-- templ as a react replacement
-- go backend
-- htmx to extend html
-- probably tailwind
-- maybe typescript or jsdoc as a ts replacement
-- maybe air
+## plans
+
+- [x] SPA
+- [x] templ as a react replacement
+- [x] go backend
+- [x] htmx to extend html
+- [ ] probably tailwind or maybe not?
+- [ ] maybe typescript or jsdoc as a ts replacement
+- [ ] maybe air for hot reloading
+
+## workarounds (unplanned features)
+
+- [x] esbuild to bundle js and css
 
 ## setup
 
