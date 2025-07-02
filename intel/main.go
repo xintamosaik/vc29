@@ -249,15 +249,18 @@ func stampToDate(fileNameOnly string) (string, error) {
 
 func getAnnotations(intelID string) ([]Annotation, error) {
 	annotationsDir := directoryAnnotations + "/" + intelID
+
 	files, err := os.ReadDir(annotationsDir)
 	if err != nil {
+		log.Printf("Error reading annotations directory %s: %v", annotationsDir, err)
 		return nil, err
 	}
 
+	
 	annotations := make([]Annotation, 0, len(files))
 
 	for _, file := range files {
-		log.Println("Processing annotation file:", file.Name())
+		
 		if !file.IsDir() {
 			filePath := annotationsDir + "/" + file.Name()
 			fileContent, err := os.ReadFile(filePath)
@@ -358,7 +361,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 
 	// We will use unix timestamps again for the annotation file name
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	annotationFileName := directoryAnnotations + "/" + timestamp + ".json"
+	annotationFileName := directoryAnnotations + "/" + intelID + "/" + timestamp + ".json"
 	annotationFile, err := os.Create(annotationFileName)
 	if err != nil {
 		http.Error(w, "Failed to create annotation file", http.StatusInternalServerError)
