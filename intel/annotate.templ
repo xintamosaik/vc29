@@ -39,7 +39,7 @@ templ Annotate(intelFull IntelFull) {
 	}
 </div>
 <div id="send_annotation" popover>
-	<form hx-target="#root" hx-swap="innerHTML" hx-post={ "/intel/annotate/ " + intelFull.CreatedAt }>
+	<form hx-target="#root" hx-swap="innerHTML" hx-post={ "/intel/annotate/" + intelFull.CreatedAt }>
 		<h2>Add Annotation</h2>
 		<br />
 		<p id="info"></p>
