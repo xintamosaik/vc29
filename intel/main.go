@@ -257,6 +257,7 @@ func getAnnotations(intelID string) ([]Annotation, error) {
 	annotations := make([]Annotation, 0, len(files))
 
 	for _, file := range files {
+		log.Println("Processing annotation file:", file.Name())
 		if !file.IsDir() {
 			filePath := annotationsDir + "/" + file.Name()
 			fileContent, err := os.ReadFile(filePath)
@@ -302,6 +303,8 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error reading annotations:", err)
 		return
 	}
+	log.Println("Annotations loaded successfully for Intel ID:", intelID)
+	log.Println("Number of annotations:", len(annotations))
 	err = Annotate(intelFull, annotations).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
@@ -399,12 +402,19 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 
 
 	annotations := make([]Annotation, 0)
+	log.Println("Loading annotations for Intel ID:", intelID)
+	log.Println("Annotations directory:", directoryAnnotations+"/"+intelID)
+	log.Println("Annotations directory exists:", directoryAnnotations+"/"+intelID)
+
 	annotations, err = getAnnotations(intelID)
 	if err != nil {
 		http.Error(w, "Failed to read annotations", http.StatusInternalServerError)
 		log.Println("Error reading annotations:", err)
 		return
 	}
+
+	log.Println("Annotations loaded successfully for Intel ID:", intelID)
+	log.Println("Number of annotations:", len(annotations))
 
 	intelFull, err := getIntelFull(directory + "/" + intelID + ".json")
 	if err != nil {
