@@ -366,8 +366,11 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Annotation page rendered successfully")
 	log.Println("New annotation submission handled successfully")
-	// We could also redirect to the Intel index page, but we want to stay on the
-	// annotation page to allow the user to add more annotations if they want to.
+	// Most web devs do success messages but we will do something clever. 
+	// So we will actually load the annotations that already exist. And if one of them is only some minutes old, we will show something that 
+	// gives a hint about that. "Latest add: some minutes ago - keyword: something"
+	// Later though.
+	
 }
 
 // Register initializes the Intel handlers for the HTMX routes.
