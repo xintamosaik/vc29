@@ -347,8 +347,24 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 	// Respond with success
 	w.Header().Set("Content-Type", "text/plain")
 
+	// We show the use the annotation page for the intel again, so they can add more annotations
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Annotation submitted successfully"))
+	intelFull, err := getIntelFull(directory + "/" + intelID + ".json")
+	if err != nil {
+		http.Error(w, "Failed to read intel file", http.StatusInternalServerError)
+		log.Println("Error reading intel file:", err)
+		return
+	}
+	err = Annotate(intelFull).Render(context.Background(), w)
+	if err != nil {
+		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
+		log.Println("Error rendering annotation page:", err)
+		return
+	}
+	log.Println("Annotation page rendered successfully")
+	log.Println("New annotation submission handled successfully")
+	// We could also redirect to the Intel index page, but we want to stay on the
+	// annotation page to allow the user to add more annotations if they want to.
 }
 
 // Register initializes the Intel handlers for the HTMX routes.
