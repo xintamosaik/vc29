@@ -401,16 +401,9 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Annotation page rendered successfully")
 	log.Println("New annotation submission handled successfully")
-	// Most web devs do success messages but we will do something clever.
-	// So we will actually load the annotations that already exist. And if one of them is only some minutes old, we will show something that
-	// gives a hint about that. "Latest add: some minutes ago - keyword: something"
-	// Later though. Which I guess is now..
-
+	
 
 	annotations := make([]Annotation, 0)
-	log.Println("Loading annotations for Intel ID:", intelID)
-	log.Println("Annotations directory:", directoryAnnotations+"/"+intelID)
-	log.Println("Annotations directory exists:", directoryAnnotations+"/"+intelID)
 
 	annotations, err = getAnnotations(intelID)
 	if err != nil {
@@ -418,9 +411,6 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error reading annotations:", err)
 		return
 	}
-
-	log.Println("Annotations loaded successfully for Intel ID:", intelID)
-	log.Println("Number of annotations:", len(annotations))
 
 	intelFull, err := getIntelFull(directory + "/" + intelID + ".json")
 	if err != nil {
