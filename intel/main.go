@@ -279,6 +279,7 @@ type Annotation struct {
 	StartWord      string `json:"start_word"`
 	EndParagraph   string `json:"end_paragraph"`
 	EndWord        string `json:"end_word"`
+	Keyword        string `json:"keyword"`
 	Description    string `json:"description"`
 	UpdatedAt      string `json:"updated_at"` // We do not need created_at, because we use the file name as a timestamp
 }
@@ -301,6 +302,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 	startWord := r.FormValue("start_word")
 	endParagraph := r.FormValue("end_paragraph")
 	endWord := r.FormValue("end_word")
+	keyword := r.FormValue("keyword")
 	description := r.FormValue("description")
 
 	log.Printf("New annotation for Intel ID %s: start(%s, %s), end(%s, %s), description: %s\n",
@@ -323,13 +325,14 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer annotationFile.Close()
-	
+
 	annotation := Annotation{
 		IntelID:        intelID,
 		StartParagraph: startParagraph,
 		StartWord:      startWord,
 		EndParagraph:   endParagraph,
 		EndWord:        endWord,
+		Keyword:        keyword,
 		Description:    description,
 		UpdatedAt:      timestamp, // We use the timestamp as the updated_at field
 	}
