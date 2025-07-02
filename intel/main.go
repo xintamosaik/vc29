@@ -261,23 +261,26 @@ func getAnnotations(intelID string) ([]Annotation, error) {
 
 	for _, file := range files {
 		
-		if !file.IsDir() {
-			filePath := annotationsDir + "/" + file.Name()
-			fileContent, err := os.ReadFile(filePath)
-			if err != nil {
-				log.Printf("Error reading annotation file %s: %v", file.Name(), err)
-				continue
-			}
-
-			var annotation Annotation
-			if err := json.Unmarshal(fileContent, &annotation); err != nil {
-				log.Printf("Error unmarshalling annotation file %s: %v", file.Name(), err)
-				continue
-			}
-
-			annotation.UpdatedAt = strings.TrimSuffix(file.Name(), ".json") // Use the file name as the updated_at field
-			annotations = append(annotations, annotation)
+		if file.IsDir() {
+			continue;
 		}
+		
+		filePath := annotationsDir + "/" + file.Name()
+		fileContent, err := os.ReadFile(filePath)
+		if err != nil {
+			log.Printf("Error reading annotation file %s: %v", file.Name(), err)
+			continue
+		}
+
+		var annotation Annotation
+		if err := json.Unmarshal(fileContent, &annotation); err != nil {
+			log.Printf("Error unmarshalling annotation file %s: %v", file.Name(), err)
+			continue
+		}
+
+		annotation.UpdatedAt = strings.TrimSuffix(file.Name(), ".json") // Use the file name as the updated_at field
+		annotations = append(annotations, annotation)
+	
 	}
 
 	return annotations, nil
