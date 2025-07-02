@@ -14,6 +14,7 @@ import (
 )
 
 const directory = "data/intel"
+const directoryAnnotations = "data/annotations"
 
 // IntelJSON represents the structure of the intel data stored in JSON files.
 type IntelJSON struct {
@@ -272,10 +273,89 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 	log.Println("Intel annotation page rendered successfully")
 }
 
+type Annotation struct {
+	IntelID        string `json:"intel_id"`
+	StartParagraph string `json:"start_paragraph"`
+	StartWord      string `json:"start_word"`
+	EndParagraph   string `json:"end_paragraph"`
+	EndWord        string `json:"end_word"`
+	Description    string `json:"description"`
+	UpdatedAt      string `json:"updated_at"` // We do not need created_at, because we use the file name as a timestamp
+}
+
+func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
+	log.Println("Handling new annotation submission")
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	intelID := r.PathValue("id")
+	if intelID == "" {
+		http.Error(w, "Intel ID is required", http.StatusBadRequest)
+		return
+	}
+
+	startParagraph := r.FormValue("start_paragraph")
+	startWord := r.FormValue("start_word")
+	endParagraph := r.FormValue("end_paragraph")
+	endWord := r.FormValue("end_word")
+	description := r.FormValue("description")
+
+	log.Printf("New annotation for Intel ID %s: start(%s, %s), end(%s, %s), description: %s\n",
+		intelID, startParagraph, startWord, endParagraph, endWord, description) // And yes, that worked
+
+	// Create the annotations directory if it doesn't exist
+	if err := os.MkdirAll(directoryAnnotations, 0755); err != nil {
+		http.Error(w, "Failed to create annotations directory", http.StatusInternalServerError)
+		log.Println("Error creating annotations directory:", err)
+		return
+	}
+
+	// We will use unix timestamps again for the annotation file name
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	annotationFileName := directoryAnnotations + "/" + intelID + "_" + timestamp + ".json"
+	annotationFile, err := os.Create(annotationFileName)
+	if err != nil {
+		http.Error(w, "Failed to create annotation file", http.StatusInternalServerError)
+		log.Println("Error creating annotation file:", err)
+		return
+	}
+	defer annotationFile.Close()
+	
+	annotation := Annotation{
+		IntelID:        intelID,
+		StartParagraph: startParagraph,
+		StartWord:      startWord,
+		EndParagraph:   endParagraph,
+		EndWord:        endWord,
+		Description:    description,
+		UpdatedAt:      timestamp, // We use the timestamp as the updated_at field
+	}
+	encoder := json.NewEncoder(annotationFile)
+	if err := encoder.Encode(annotation); err != nil {
+		http.Error(w, "Failed to encode annotation JSON", http.StatusInternalServerError)
+		log.Println("Error encoding annotation JSON:", err)
+		return
+	}
+
+	// We need to actually save the annotation to a file
+	log.Printf("Annotation for Intel ID %s saved to %s\n", intelID, annotationFileName)
+	// Log the success
+	log.Printf("Annotation saved to %s\n", annotationFileName)
+	// Respond with success
+	w.Header().Set("Content-Type", "text/plain")
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Annotation submitted successfully"))
+}
+
 // Register initializes the Intel handlers for the HTMX routes.
 func Register() {
 	http.HandleFunc("GET /intel", HandleIntelIndex)
 	http.Handle("GET /intel/new", templ.Handler(New()))
 	http.HandleFunc("POST /intel/create", HandleNewIntel)
 	http.HandleFunc("GET /intel/annotate/{id}", HandleAnnotate)
+	http.HandleFunc("POST /intel/annotate/{id}", HandleNewAnnotation)
 }
