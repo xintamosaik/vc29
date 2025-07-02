@@ -247,6 +247,38 @@ func stampToDate(fileNameOnly string) (string, error) {
 	return date.Format("2006-01-02 15:04:05"), nil
 }
 
+func getAnnotations(intelID string) ([]Annotation, error) {
+	annotationsDir := directoryAnnotations + "/" + intelID
+	files, err := os.ReadDir(annotationsDir)
+	if err != nil {
+		return nil, err
+	}
+
+	annotations := make([]Annotation, 0, len(files))
+
+	for _, file := range files {
+		if !file.IsDir() {
+			filePath := annotationsDir + "/" + file.Name()
+			fileContent, err := os.ReadFile(filePath)
+			if err != nil {
+				log.Printf("Error reading annotation file %s: %v", file.Name(), err)
+				continue
+			}
+
+			var annotation Annotation
+			if err := json.Unmarshal(fileContent, &annotation); err != nil {
+				log.Printf("Error unmarshalling annotation file %s: %v", file.Name(), err)
+				continue
+			}
+
+			annotation.UpdatedAt = strings.TrimSuffix(file.Name(), ".json") // Use the file name as the updated_at field
+			annotations = append(annotations, annotation)
+		}
+	}
+
+	return annotations, nil
+}
+
 // handleAnnotate is a view that gets an intel data and then allows users to add annotations to it.
 func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling Intel annotation")
@@ -263,7 +295,14 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error reading intel file:", err)
 		return
 	}
-	err = Annotate(intelFull).Render(context.Background(), w)
+
+	annotations,err := getAnnotations(intelID)
+	if err != nil {
+		http.Error(w, "Failed to read annotations", http.StatusInternalServerError)
+		log.Println("Error reading annotations:", err)
+		return
+	}
+	err = Annotate(intelFull, annotations).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
 		log.Println("Error rendering annotation page:", err)
@@ -308,7 +347,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		intelID, startParagraph, startWord, endParagraph, endWord, description) // And yes, that worked
 
 	// Create the annotations directory if it doesn't exist
-	if err := os.MkdirAll(directoryAnnotations + "/" + intelID, 0755); err != nil {
+	if err := os.MkdirAll(directoryAnnotations+"/"+intelID, 0755); err != nil {
 		http.Error(w, "Failed to create annotations directory", http.StatusInternalServerError)
 		log.Println("Error creating annotations directory:", err)
 		return
@@ -350,25 +389,36 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 
 	// We show the use the annotation page for the intel again, so they can add more annotations
 	w.WriteHeader(http.StatusOK)
+
+	log.Println("Annotation page rendered successfully")
+	log.Println("New annotation submission handled successfully")
+	// Most web devs do success messages but we will do something clever.
+	// So we will actually load the annotations that already exist. And if one of them is only some minutes old, we will show something that
+	// gives a hint about that. "Latest add: some minutes ago - keyword: something"
+	// Later though. Which I guess is now..
+
+
+	annotations := make([]Annotation, 0)
+	annotations, err = getAnnotations(intelID)
+	if err != nil {
+		http.Error(w, "Failed to read annotations", http.StatusInternalServerError)
+		log.Println("Error reading annotations:", err)
+		return
+	}
+
 	intelFull, err := getIntelFull(directory + "/" + intelID + ".json")
 	if err != nil {
 		http.Error(w, "Failed to read intel file", http.StatusInternalServerError)
 		log.Println("Error reading intel file:", err)
 		return
 	}
-	err = Annotate(intelFull).Render(context.Background(), w)
+
+	err = Annotate(intelFull, annotations).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
 		log.Println("Error rendering annotation page:", err)
 		return
 	}
-	log.Println("Annotation page rendered successfully")
-	log.Println("New annotation submission handled successfully")
-	// Most web devs do success messages but we will do something clever. 
-	// So we will actually load the annotations that already exist. And if one of them is only some minutes old, we will show something that 
-	// gives a hint about that. "Latest add: some minutes ago - keyword: something"
-	// Later though.
-
 }
 
 // Register initializes the Intel handlers for the HTMX routes.
