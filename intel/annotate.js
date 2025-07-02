@@ -40,6 +40,17 @@ export default function AnnotationScript(event) {
     const info = document.querySelector("#info");
     info.textContent = `Selected "${selectedText}" from paragraph ${startParagraphIndex} word ${startWord} to paragraph ${endParagraphIndex} word ${endWord}`;
 
+    // Fill the hidden input fields with the selected text and positions
+    // We do it dirty be addressing the ids of elements in global scope
+    // Don't do this at home, kids!
+    window.start_paragraph.value = startParagraphIndex;
+    window.start_word.value = startWord;
+  
+    window.end_paragraph.value = endParagraphIndex;
+    window.end_word.value = endWord;
+ 
+    window.selected_text.value = selectedText;
+
     const popover = document.querySelector("#send_annotation");
 
     popover.showPopover();

@@ -1,0 +1,4 @@
+div#send_annotation {
+    width: min(64ch, 100%);
+    padding: 2ch;
+}
