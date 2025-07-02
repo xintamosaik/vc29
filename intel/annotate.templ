@@ -5,63 +5,57 @@ import "github.com/xintamosaik/vc29/navigation"
 var helloHandle = templ.NewOnceHandle()
 
 templ IntelParagraph(line []string) {
-for index, part := range line {
-<span data-word={ index }>{ part + " " }</span>
-}
+	for index, part := range line {
+		<span data-word={ index }>{ part + " " }</span>
+	}
 }
 
 templ Annotate(intelFull IntelFull) {
-
-@navigation.Main("")
-<h2>
-	<span>
-		Annotate Intel:
-	</span>
-	<span id="title">
-		{ intelFull.Title }
-	</span>
-</h2>
-<h3 id="created_at">
-	{ intelFull.CreatedAt }
-</h3>
-<h4 id="description">
-	{ intelFull.Description }
-</h4>
-<div id="content" onmouseup="handleAnnotateMouseUp(event)">
-	for index, section := range intelFull.Content {
-	<p data-paragraph={ index }>
-		if len(section) == 0 {
-		<span data-word="0"></span>
-		} else {
-		@IntelParagraph(section)
+	@navigation.Main("")
+	<h2>
+		<span>
+			Annotate Intel:
+		</span>
+		<span id="title">
+			{ intelFull.Title }
+		</span>
+	</h2>
+	<h3 id="created_at">
+		{ intelFull.CreatedAt }
+	</h3>
+	<h4 id="description">
+		{ intelFull.Description }
+	</h4>
+	<div id="content" onmouseup="handleAnnotateMouseUp(event)">
+		for index, section := range intelFull.Content {
+			<p data-paragraph={ index }>
+				if len(section) == 0 {
+					<span data-word="0"></span>
+				} else {
+					@IntelParagraph(section)
+				}
+			</p>
 		}
-	</p>
-	}
-</div>
-<div id="send_annotation" popover>
-	<form hx-target="#root" hx-swap="innerHTML" hx-post={ "/intel/annotate/" + intelFull.CreatedAt }>
-		<h2>Add Annotation</h2>
-		<br />
-		<p id="info"></p>
-		<br />
-	
-		<label for="keyword">Keyword:</label>
-		<input type="text" id="keyword" name="keyword" placeholder="Enter keyword" required />
-		<br />
-		<label for="description">Description:</label>
-		<textarea id="description" name="description" placeholder="Enter description"></textarea>
-		<br />
-
-		<button type="submit">Submit Annotation</button>
-		<button type="button">Close</button>
-
-		<input type="hidden" name="start_paragraph" id="start_paragraph" />
-		<input type="hidden" name="start_word" id="start_word" />
-	
-		<input type="hidden" name="end_paragraph" id="end_paragraph" />
-		<input type="hidden" name="end_word" id="end_word" />
-		
-		<input type="hidden" name="selected_text" id="selected_text" />
-	</form>
-</div>
+	</div>
+	<div id="send_annotation" popover>
+		<form hx-target="#root" hx-swap="innerHTML" hx-post={ "/intel/annotate/" + intelFull.CreatedAt }>
+			<h2>Add Annotation</h2>
+			<br/>
+			<p id="info"></p>
+			<br/>
+			<label for="keyword">Keyword:</label>
+			<input type="text" id="keyword" name="keyword" placeholder="Enter keyword" required/>
+			<br/>
+			<label for="description">Description:</label>
+			<textarea id="description" name="description" placeholder="Enter description"></textarea>
+			<br/>
+			<button type="submit">Submit Annotation</button>
+			<button type="button">Close</button>
+			<input type="hidden" name="start_paragraph" id="start_paragraph"/>
+			<input type="hidden" name="start_word" id="start_word"/>
+			<input type="hidden" name="end_paragraph" id="end_paragraph"/>
+			<input type="hidden" name="end_word" id="end_word"/>
+			<input type="hidden" name="selected_text" id="selected_text"/>
+		</form>
+	</div>
 }
