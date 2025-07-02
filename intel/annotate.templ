@@ -41,14 +41,7 @@ templ Annotate(intelFull IntelFull) {
 	<div id="send_annotation" popover>
 		<form hx-target="#root" hx-swap="innerHTML" hx-post={ "/intel/annotate/ " + intelFull.CreatedAt }>
 			<h2>Add Annotation</h2>
-			<input type="text" name="content" readonly/>
-			<input type="first_word" name="first_word" readonly/>
-			<input type="last_word" name="last_word" readonly/>
-			<input type="start_paragraph" name="start_paragraph" readonly/>
-			<input type="end_paragraph" name="end_paragraph" readonly/>
-			<input type="start_word" name="start_word" readonly/>
-			<input type="end_word" name="end_word" readonly/>
-			<input type="text" name="keywords" placeholder="Keywords (comma separated)" required/>
+			<p id="info"></p>
 			<br />
 			<button type="submit">Submit Annotation</button>
 			<button type="button">Close</button>
