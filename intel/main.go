@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/a-h/templ"
 )
 
 const directory = "data/intel"
@@ -167,8 +169,8 @@ func getIntelShort(fileName string) (IntelShort, error) {
 
 	trimmedFileName := strings.TrimSuffix(fileName, ".json")
 	fileNameOnly := strings.TrimPrefix(trimmedFileName, directory+"/") // Whhich is a unix time stamp
-	
-	intelShort.CreatedAt =fileNameOnly 
+
+	intelShort.CreatedAt = fileNameOnly
 	intelShort.Description = intel.Description
 	intelShort.Title = intel.Title
 
@@ -201,7 +203,6 @@ func getAllIntelShorts() ([]IntelShort, error) {
 
 	return intels, nil
 }
-
 
 // HandleIntelIndex handles the request for the Intel index page.
 // It reads all intel files, creates a list of IntelShort objects,
@@ -236,7 +237,7 @@ func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
 // If the input is not a valid timestamp, it returns an error.
 func stampToDate(fileNameOnly string) (string, error) {
 	timestamp, err := strconv.ParseInt(fileNameOnly, 10, 64)
-		if err != nil {
+	if err != nil {
 		return "", err
 	}
 
@@ -246,11 +247,11 @@ func stampToDate(fileNameOnly string) (string, error) {
 }
 
 // handleAnnotate is a view that gets an intel data and then allows users to add annotations to it.
-func HandleAnnotate( w http.ResponseWriter, r *http.Request) {
+func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling Intel annotation")
 
 	intelID := r.PathValue("id")
-	
+
 	if intelID == "" {
 		http.Error(w, "Intel ID is required", http.StatusBadRequest)
 		return
@@ -269,5 +270,12 @@ func HandleAnnotate( w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("Intel annotation page rendered successfully")
+}
 
+// Register initializes the Intel handlers for the HTMX routes.
+func Register() {
+	http.HandleFunc("GET /intel", HandleIntelIndex)
+	http.Handle("GET /intel/new", templ.Handler(New()))
+	http.HandleFunc("POST /intel/create", HandleNewIntel)
+	http.HandleFunc("GET /intel/annotate/{id}", HandleAnnotate)
 }

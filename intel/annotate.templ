@@ -49,8 +49,10 @@ templ Annotate(intelFull IntelFull) {
 			<label for="description">Description:</label>
 			<textarea id="description" name="description" placeholder="Enter description"></textarea>
 			<br/>
-			<button type="submit">Submit Annotation</button>
-			<button type="button">Close</button>
+			<div style="display: flex; justify-content: space-between; align-items: center;">
+				<button type="submit">Submit Annotation</button>
+				<button type="button">Close</button>
+			</div>
 			<input type="hidden" name="start_paragraph" id="start_paragraph"/>
 			<input type="hidden" name="start_word" id="start_word"/>
 			<input type="hidden" name="end_paragraph" id="end_paragraph"/>

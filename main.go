@@ -27,7 +27,7 @@ func main() {
 
 	// Bundle the JavaScript and CSS files using esbuild
 	result := api.Build(api.BuildOptions{
-		
+
 		EntryPoints:       []string{"src.js"},
 		Outfile:           "dist.js",
 		Bundle:            true,
@@ -65,12 +65,9 @@ func main() {
 	// HTMX handlers: home
 	http.Handle("/home", templ.Handler(home.Index()))
 
-	// HTMX handlers: intel
-	http.HandleFunc("/intel", intel.HandleIntelIndex)
-	http.Handle("/intel/new", templ.Handler(intel.New()))
-	http.HandleFunc("POST /intel/create", intel.HandleNewIntel)
-	http.HandleFunc("GET /intel/annotate/{id}", intel.HandleAnnotate)
-	
+	// HTMX handlers: intel - alternative approach using Register function
+	intel.Register()
+
 	// HTMX handlers: drafts
 	http.Handle("/drafts", templ.Handler(drafts.Index()))
 
