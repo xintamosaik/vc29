@@ -35,9 +35,9 @@ func main() {
 		LogLevel:          api.LogLevelInfo,
 		Format:            api.FormatIIFE,
 		Platform:          api.PlatformBrowser,
-		MinifyWhitespace:  false,
-		MinifyIdentifiers: false,
-		MinifySyntax:      false,
+		MinifyWhitespace:  false, // for dev builds - change later
+		MinifyIdentifiers: false, // for dev builds - change later
+		MinifySyntax:      false, // for dev builds - change later
 		Loader: map[string]api.Loader{
 			".css": api.LoaderCSS,
 		},
