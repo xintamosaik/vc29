@@ -3,6 +3,7 @@ package intel
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -280,9 +281,32 @@ func getAnnotatedIntel(id string) (AnnotatedIntel, error){
 	log.Println("Annotations retrieved successfully for Intel ID:", id)
 	log.Println("Number of annotations:", len(annotations)) // result of len: 4 - good!
 
-
-
-	return AnnotatedIntel{}, nil
+	annotatedContent := make([][]AnnotatedWord, len(full.Content))
+	for i, paragraph := range full.Content {
+		annotatedContent[i] = make([]AnnotatedWord, len(paragraph))
+		for j, word := range paragraph {
+			annotatedContent[i][j] = AnnotatedWord{
+				Word:        word,
+				AnnotationIDs: []string{}, // Initialize with an empty slice
+			}
+			// Check if there are annotations for this word
+			for _, annotation := range annotations {
+				if annotation.StartParagraph == strconv.Itoa(i) && annotation.StartWord == strconv.Itoa(j) {
+					log.Printf("Found annotation for paragraph %d, word %d: %s", i, j, annotation.Keyword)
+					// If the annotation starts at this word, add its ID to the list
+					annotatedContent[i][j].AnnotationIDs = append(annotatedContent[i][j].AnnotationIDs, annotation.UpdatedAt)
+				}
+			}
+		}
+	}
+	log.Println("Annotated content created successfully")
+	
+	return AnnotatedIntel{
+		CreatedAt:   full.CreatedAt,
+		Title:       full.Title,
+		Description: full.Description,
+		Content:     annotatedContent,
+	}, nil	
 
 }
 
@@ -477,5 +501,30 @@ func Register() {
 		log.Println("No intel data found")	
 	}
 	firstIntel := allIntel[0].CreatedAt // Assuming you want to use the first intel as a placeholder
-	getAnnotatedIntel(firstIntel) // This is just a placeholder call to demonstrate the function's existence
+	// inspect the intel data
+	log.Println("Intel data inspection complete. First Intel CreatedAt:", firstIntel)
+	log.Println("Intel data inspection complete. Number of Intel entries:", len(allIntel))
+	log.Println("Intel data inspection complete. First Intel Title:", allIntel[0].Title)
+	log.Println("Intel data inspection complete. First Intel Description:", allIntel[0].Description)
+
+	annotated, err := getAnnotatedIntel(firstIntel) // This is just a placeholder call to demonstrate the function's existence
+	if err != nil {
+		log.Println("No annotated intel data found")
+		return
+	}
+	log.Println("Annotated Intel data inspection complete. Title:", annotated.Title)
+	log.Println("Annotated Intel data inspection complete. Description:", annotated.Description)
+	log.Println("Annotated Intel data inspection complete. CreatedAt:", annotated.CreatedAt)
+	log.Println("Annotated Intel data inspection complete. Content length:", len(annotated.Content))
+	log.Println("Annotated Intel data inspection complete. Content first paragraph length:", len(annotated.Content[0]))
+	log.Println("Annotated Intel data inspection complete. Content first paragraph first word:", annotated.Content[0][0].Word)
+	log.Println("Annotated Intel data inspection complete. Number of annotations in first paragraph first word:", len(annotated.Content[0][0].AnnotationIDs))	
+
+
+
+	// Pretty print with field names
+	fmt.Printf("%+v\n", annotated)
+
+	// Even more detailed with type info
+    // fmt.Printf("%#v\n", annotated)
 }
