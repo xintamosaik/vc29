@@ -3,46 +3,46 @@ div#send_annotation {
     padding: 2ch;
 }
 
-#experimental [data-marked] {
+#content [data-marked] {
     cursor: pointer;
     font-style: italic;
 }
 
-#experimental [data-marked="1"] {
+#content [data-marked="1"] {
     background-color: #ff04;
 
 }
-#experimental [data-marked="2"] {
+#content [data-marked="2"] {
     background-color: #ff05;
 
    
 }
-#experimental [data-marked="3"] {
+#content [data-marked="3"] {
     background-color: #fc06;
 
    
 }
-#experimental [data-marked="4"] {
+#content [data-marked="4"] {
     background-color:  #fc07;
     font-weight: bold;
 }
 
-#experimental [data-marked="5"] {
+#content [data-marked="5"] {
     background-color: #fa08;
     font-weight: bold;
 }
 
-#experimental [data-marked="6"] {
+#content [data-marked="6"] {
     background-color: #fa09;
     font-weight: bold;
 }
 
-#experimental [data-marked="7"] {
+#content [data-marked="7"] {
     background-color: #f70a;
     font-weight: bold;
 }
 
-#experimental [data-marked="8"] {
+#content [data-marked="8"] {
     background-color: #f70b;
     font-weight: bold;
 }

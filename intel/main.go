@@ -56,9 +56,9 @@ type AnnotatedWord struct {
 }
 
 type AnnotatedIntel struct {
-	CreatedAt   string
-	Title       string
-	Description string
+	CreatedAt   string `json:"created_at"` // This is a timestamp in string format, e.g., "1633072800"
+	Title       string `json:"title"`
+	Description string `json:"description"`
 	Content     [][]AnnotatedWord `json:"content"` // This is a slice of slices of AnnotatedWord, where each AnnotatedWord contains the word and its annotations
 }
 
@@ -437,12 +437,7 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Intel ID is required", http.StatusBadRequest)
 		return
 	}
-	intelFull, err := getIntelFull(directory + "/" + intelID + ".json")
-	if err != nil {
-		http.Error(w, "Failed to read intel file", http.StatusInternalServerError)
-		log.Println("Error reading intel file:", err)
-		return
-	}
+
 
 	annotations, err := getAnnotations(intelID)
 	if err != nil {
@@ -458,7 +453,7 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error getting annotated intel:", err)
 		return
 	}
-	err = Annotate(intelFull, annotations, annotatedIntel).Render(context.Background(), w)
+	err = Annotate( annotations, annotatedIntel).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
 		log.Println("Error rendering annotation page:", err)
@@ -536,12 +531,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	intelFull, err := getIntelFull(directory + "/" + intelID + ".json")
-	if err != nil {
-		http.Error(w, "Failed to read intel file", http.StatusInternalServerError)
-		log.Println("Error reading intel file:", err)
-		return
-	}
+
 
 	annotatedIntel, err := getAnnotatedIntel(intelID)
 	if err != nil {
@@ -550,7 +540,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = Annotate(intelFull, annotations, annotatedIntel).Render(context.Background(), w)
+	err = Annotate( annotations, annotatedIntel).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
 		log.Println("Error rendering annotation page:", err)

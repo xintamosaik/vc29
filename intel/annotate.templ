@@ -10,19 +10,26 @@ templ IntelParagraph(line []string) {
 		<span data-word={ index }>{ part + " " }</span>
 	}
 }
-
+templ annotatedWord(index int, part AnnotatedWord) {
+	<span
+	data-word={ index }
+	data-annotations={ strings.Join(part.AnnotationIDs, ",") }
+	data-marked={ len(part.AnnotationIDs) }
+	data-keywords={ strings.Join(part.Keywords, ",") }
+	title={ "keywords: " + strings.Join(part.Keywords, ", " ) }>
+	{ part.Word + " " }
+</span>
+}
+templ plainWord(index int, word string) {
+	<span data-word={ index }>{ word + " " }</span>
+} 
 templ experimentalParagraph(line []AnnotatedWord) {
 	for index, part := range line {
-		<span
-			data-word={ index }
-			data-annotations={ strings.Join(part.AnnotationIDs, ",") }
-			data-marked={ len(part.AnnotationIDs) }
-			data-keywords={ strings.Join(part.Keywords, ",") }
-			title={ "keywords: " +
-	strings.Join(part.Keywords, ", " ) }
-		>
-			{ part.Word + " " }
-		</span>
+		if len(part.AnnotationIDs) == 0 {
+			@plainWord(index, part.Word)
+		} else {
+			@annotatedWord(index, part)
+		}
 	}
 }
 
@@ -38,26 +45,26 @@ templ experiment(annotatedIntel AnnotatedIntel) {
 	}
 }
 
-templ Annotate(intelFull IntelFull, annotations []Annotation, annotatedIntel AnnotatedIntel) {
+templ Annotate(annotations []Annotation, annotatedIntel AnnotatedIntel) {
 	@navigation.Main("")
 	<h2>
 		<span>
 			Annotate Intel:
 		</span>
 		<span id="title">
-			{ intelFull.Title }
+			{ annotatedIntel.Title }
 		</span>
 	</h2>
 	<h3 id="created_at">
-		{ intelFull.CreatedAt }
+		{ annotatedIntel.CreatedAt }
 	</h3>
 	<h4 id="description">
-		{ intelFull.Description }
+		{ annotatedIntel.Description }
 	</h4>
 	<br/>
 	<hr/>
 	<br/>
-	<div id="experimental" onmouseup="handleAnnotateMouseUp(event)">
+	<div id="content" onmouseup="handleAnnotateMouseUp(event)">
 		<h3>Experimental Intel</h3>
 		<p>
 			This is an experimental version of the intel with annotations.
@@ -88,22 +95,8 @@ templ Annotate(intelFull IntelFull, annotations []Annotation, annotatedIntel Ann
 	<br/>
 	<hr/>
 	<br/>
-	<div id="content" onmouseup="handleAnnotateMouseUp(event)">
-		for index, section := range intelFull.Content {
-			<p data-paragraph={ index }>
-				if len(section) == 0 {
-					<span data-word="0"></span>
-				} else {
-					@IntelParagraph(section)
-				}
-			</p>
-		}
-	</div>
-	<br/>
-	<hr/>
-	<br/>
 	<div id="send_annotation" popover>
-		<form hx-target="#root" hx-swap="innerHTML" hx-post={ "/intel/annotate/" + intelFull.CreatedAt }>
+		<form hx-target="#root" hx-swap="innerHTML" hx-post={ "/intel/annotate/" + annotatedIntel.CreatedAt }>
 			<h2>Add Annotation</h2>
 			<br/>
 			<p id="info"></p>
