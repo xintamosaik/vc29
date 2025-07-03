@@ -5,10 +5,6 @@ import (
 	"github.com/xintamosaik/vc29/navigation"
 )
 
-
-
-var helloHandle = templ.NewOnceHandle()
-
 templ IntelParagraph(line []string) {
 	for index, part := range line {
 		<span data-word={ index }>{ part + " " }</span>
