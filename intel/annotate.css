@@ -2,3 +2,26 @@ div#send_annotation {
     width: min(64ch, 100%);
     padding: 2ch;
 }
+#experimental [data-marked=1] {
+    background-color: #0f07;
+    font-weight: bold;
+}
+#experimental [data-marked=2] {
+    background-color: #8f07;
+    font-weight: bold;
+   
+}
+#experimental [data-marked=3] {
+    background-color: #ff07;
+    font-weight: bold;
+   
+}
+#experimental [data-marked=4] {
+    background-color: #f807;
+    font-weight: bold;
+}
+
+#experimental [data-marked=5] {
+    background-color: #f007;
+    font-weight: bold;
+}

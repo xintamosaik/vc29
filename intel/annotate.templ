@@ -17,7 +17,7 @@ templ IntelParagraph(line []string) {
 
 templ experimentalParagraph(line []AnnotatedWord) {
 	for index, part := range line {
-		<span data-word={ index } data-annotations={ strings.Join(part.AnnotationIDs, ",") }>
+		<span data-word={ index } data-annotations={ strings.Join(part.AnnotationIDs, ",") } data-marked={ len(part.AnnotationIDs) } >
 			{ part.Word + " " }
 		</span>
 	}
@@ -29,7 +29,7 @@ templ experiment(annotatedIntel AnnotatedIntel) {
 		</p>
 	}
 }
-templ Annotate(intelFull IntelFull, annotations []Annotation) {
+templ Annotate(intelFull IntelFull, annotations []Annotation, annotatedIntel AnnotatedIntel) {
 	@navigation.Main("")
 	<h2>
 		<span>
@@ -54,6 +54,15 @@ templ Annotate(intelFull IntelFull, annotations []Annotation) {
 				<p class="annotation_range">Paragraph { annotation.StartParagraph } Word { annotation.StartWord } to Paragraph { annotation.EndParagraph } Word { annotation.EndWord }</p>
 			</div>
 		}
+	</div>
+	<div id="experimental">
+		<h3>Experimental Intel</h3>
+		<p>
+			This is an experimental version of the intel with annotations.
+			It is not yet finalized and may contain errors.
+			Please review the annotations carefully.
+		</p>
+		@experiment(annotatedIntel)
 	</div>
 	<div id="content" onmouseup="handleAnnotateMouseUp(event)">
 		for index, section := range intelFull.Content {

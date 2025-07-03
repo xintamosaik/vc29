@@ -449,7 +449,13 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Annotations loaded successfully for Intel ID:", intelID)
 	log.Println("Number of annotations:", len(annotations))
-	err = Annotate(intelFull, annotations).Render(context.Background(), w)
+	annotatedIntel, err := getAnnotatedIntel(intelID)
+	if err != nil {
+		http.Error(w, "Failed to get annotated intel", http.StatusInternalServerError)
+		log.Println("Error getting annotated intel:", err)
+		return
+	}
+	err = Annotate(intelFull, annotations, annotatedIntel).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
 		log.Println("Error rendering annotation page:", err)
@@ -534,7 +540,14 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = Annotate(intelFull, annotations).Render(context.Background(), w)
+	annotatedIntel, err := getAnnotatedIntel(intelID)
+	if err != nil {
+		http.Error(w, "Failed to get annotated intel", http.StatusInternalServerError)
+		log.Println("Error getting annotated intel:", err)
+		return
+	}
+
+	err = Annotate(intelFull, annotations, annotatedIntel).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
 		log.Println("Error rendering annotation page:", err)
