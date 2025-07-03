@@ -28,9 +28,13 @@ templ experimentalParagraph(line []AnnotatedWord) {
 
 templ experiment(annotatedIntel AnnotatedIntel) {
 	for index, intel := range annotatedIntel.Content {
-		<p data-paragraph={ index }>
-			@experimentalParagraph(intel)
-		</p>
+		if len(intel) == 0 {
+			<span data-word="0"></span>
+		} else {
+			<p data-paragraph={ index }>
+				@experimentalParagraph(intel)
+			</p>
+		}
 	}
 }
 
