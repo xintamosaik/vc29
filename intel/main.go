@@ -392,8 +392,14 @@ func stampToDate(fileNameOnly string) (string, error) {
 func getAnnotations(intelID string) ([]Annotation, error) {
 	annotationsDir := directoryAnnotations + "/" + intelID
 
+	
+	if err := os.MkdirAll(annotationsDir, 0755); err != nil {
+		log.Printf("Error creating annotations directory %s: %v", annotationsDir, err)
+		return nil, err
+	}
+
 	files, err := os.ReadDir(annotationsDir)
-	if err != nil {
+	if err != nil { // This is very improbable, but we handle it anyway
 		log.Printf("Error reading annotations directory %s: %v", annotationsDir, err)
 		return nil, err
 	}
@@ -530,8 +536,6 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error reading annotations:", err)
 		return
 	}
-
-
 
 	annotatedIntel, err := getAnnotatedIntel(intelID)
 	if err != nil {
