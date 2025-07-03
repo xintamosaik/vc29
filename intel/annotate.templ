@@ -1,8 +1,8 @@
 package intel
 
 import (
-	"strings"
 	"github.com/xintamosaik/vc29/navigation"
+	"strings"
 )
 
 templ IntelParagraph(line []string) {
@@ -13,16 +13,19 @@ templ IntelParagraph(line []string) {
 
 templ experimentalParagraph(line []AnnotatedWord) {
 	for index, part := range line {
-		<span 
-			data-word={ index } 
-			data-annotations={ strings.Join(part.AnnotationIDs, ",") } 
-			data-marked={ len(part.AnnotationIDs) } 
+		<span
+			data-word={ index }
+			data-annotations={ strings.Join(part.AnnotationIDs, ",") }
+			data-marked={ len(part.AnnotationIDs) }
 			data-keywords={ strings.Join(part.Keywords, ",") }
-			title={ "keywords: " + strings.Join(part.Keywords, ", ") }>
+			title={ "keywords: " +
+	strings.Join(part.Keywords, ", " ) }
+		>
 			{ part.Word + " " }
 		</span>
 	}
 }
+
 templ experiment(annotatedIntel AnnotatedIntel) {
 	for index, intel := range annotatedIntel.Content {
 		<p data-paragraph={ index }>
@@ -30,6 +33,7 @@ templ experiment(annotatedIntel AnnotatedIntel) {
 		</p>
 	}
 }
+
 templ Annotate(intelFull IntelFull, annotations []Annotation, annotatedIntel AnnotatedIntel) {
 	@navigation.Main("")
 	<h2>
@@ -46,16 +50,9 @@ templ Annotate(intelFull IntelFull, annotations []Annotation, annotatedIntel Ann
 	<h4 id="description">
 		{ intelFull.Description }
 	</h4>
-	<div id="annotations">
-		for _, annotation := range annotations {
-			<div class="annotation" data-start-paragraph={ annotation.StartParagraph } data-start-word={ annotation.StartWord } data-end-paragraph={ annotation.EndParagraph } data-end-word={ annotation.EndWord }>
-				<h4 class="annotation_keyword">{ annotation.Keyword }</h4>
-				<p class="annotation_description">{ annotation.Description }</p>
-				<p class="annotation_updated_at">Updated at: { annotation.UpdatedAt }</p>
-				<p class="annotation_range">Paragraph { annotation.StartParagraph } Word { annotation.StartWord } to Paragraph { annotation.EndParagraph } Word { annotation.EndWord }</p>
-			</div>
-		}
-	</div>
+	<br/>
+	<hr/>
+	<br/>
 	<div id="experimental" onmouseup="handleAnnotateMouseUp(event)">
 		<h3>Experimental Intel</h3>
 		<p>
@@ -65,6 +62,28 @@ templ Annotate(intelFull IntelFull, annotations []Annotation, annotatedIntel Ann
 		</p>
 		@experiment(annotatedIntel)
 	</div>
+	<div id="annotations">
+		for _, annotation := range annotations {
+			<div
+				class="annotation"
+				data-start-paragraph={ annotation.StartParagraph }
+				data-start-word={ annotation.StartWord }
+				data-end-paragraph={ annotation.EndParagraph }
+				data-end-word={ annotation.EndWord }
+			>
+				<h4 class="annotation_keyword">{ annotation.Keyword }</h4>
+				<p class="annotation_description">{ annotation.Description }</p>
+				<p class="annotation_updated_at">Updated at: { annotation.UpdatedAt }</p>
+				<p class="annotation_range">
+					Paragraph { annotation.StartParagraph } Word { annotation.StartWord } to Paragraph { 
+			annotation.EndParagraph } Word { annotation.EndWord }
+				</p>
+			</div>
+		}
+	</div>
+	<br/>
+	<hr/>
+	<br/>
 	<div id="content" onmouseup="handleAnnotateMouseUp(event)">
 		for index, section := range intelFull.Content {
 			<p data-paragraph={ index }>
@@ -76,6 +95,9 @@ templ Annotate(intelFull IntelFull, annotations []Annotation, annotatedIntel Ann
 			</p>
 		}
 	</div>
+	<br/>
+	<hr/>
+	<br/>
 	<div id="send_annotation" popover>
 		<form hx-target="#root" hx-swap="innerHTML" hx-post={ "/intel/annotate/" + intelFull.CreatedAt }>
 			<h2>Add Annotation</h2>
