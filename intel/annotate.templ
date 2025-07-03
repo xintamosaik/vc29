@@ -1,6 +1,11 @@
 package intel
 
-import "github.com/xintamosaik/vc29/navigation"
+import (
+	"strings"
+	"github.com/xintamosaik/vc29/navigation"
+)
+
+
 
 var helloHandle = templ.NewOnceHandle()
 
@@ -10,6 +15,20 @@ templ IntelParagraph(line []string) {
 	}
 }
 
+templ experimentalParagraph(line []AnnotatedWord) {
+	for index, part := range line {
+		<span data-word={ index } data-annotations={ strings.Join(part.AnnotationIDs, ",") }>
+			{ part.Word + " " }
+		</span>
+	}
+}
+templ experiment(annotatedIntel AnnotatedIntel) {
+	for index, intel := range annotatedIntel.Content {
+		<p data-paragraph={ index }>
+			@experimentalParagraph(intel)
+		</p>
+	}
+}
 templ Annotate(intelFull IntelFull, annotations []Annotation) {
 	@navigation.Main("")
 	<h2>

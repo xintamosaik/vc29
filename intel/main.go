@@ -3,7 +3,6 @@ package intel
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -39,7 +38,6 @@ type IntelFull struct {
 	Content     [][]string
 }
 
-
 // Annotation represents an annotation on an intel data.
 type Annotation struct {
 	StartParagraph string `json:"start_paragraph"`
@@ -52,7 +50,7 @@ type Annotation struct {
 }
 
 type AnnotatedWord struct {
-	Word        string `json:"word"`
+	Word          string   `json:"word"`
 	AnnotationIDs []string `json:"annotation_id"` // These are the IDs of the annotations that apply to this word
 }
 
@@ -255,7 +253,7 @@ func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getAnnotatedIntel(id string) (AnnotatedIntel, error){
+func getAnnotatedIntel(id string) (AnnotatedIntel, error) {
 	// This function is a placeholder for future implementation.
 	// It could be used to retrieve annotated intel data based on the provided ID.
 	// Currently, it does not perform any operations.
@@ -286,13 +284,13 @@ func getAnnotatedIntel(id string) (AnnotatedIntel, error){
 		annotatedContent[i] = make([]AnnotatedWord, len(paragraph))
 		for j, word := range paragraph {
 			annotatedContent[i][j] = AnnotatedWord{
-				Word:        word,
+				Word:          word,
 				AnnotationIDs: []string{}, // Initialize with an empty slice
 			}
 			// Check if there are annotations for this sequence of words
 			for _, annotation := range annotations {
 				log.Printf("Checking annotation: %+v for paragraph %d, word %d", annotation, i, j)
-				
+
 				// Convert string indices to integers for proper comparison
 				startParagraph, err := strconv.Atoi(annotation.StartParagraph)
 				if err != nil {
@@ -314,10 +312,10 @@ func getAnnotatedIntel(id string) (AnnotatedIntel, error){
 					log.Printf("Error converting end word to int: %v", err)
 					continue
 				}
-				
+
 				// Check if current position is within annotation range
 				isWithinAnnotation := false
-				
+
 				if i < startParagraph {
 					// Current paragraph is before start paragraph
 					log.Printf("Skipping annotation for paragraph %d, word %d: before start paragraph", i, j)
@@ -328,7 +326,7 @@ func getAnnotatedIntel(id string) (AnnotatedIntel, error){
 					log.Printf("Skipping annotation for paragraph %d, word %d: after end paragraph", i, j)
 					continue
 				}
-				
+
 				if i == startParagraph && i == endParagraph {
 					// Annotation is within the same paragraph
 					if j >= startWord && j <= endWord {
@@ -348,7 +346,7 @@ func getAnnotatedIntel(id string) (AnnotatedIntel, error){
 					// Current paragraph is between start and end paragraphs
 					isWithinAnnotation = true
 				}
-				
+
 				if isWithinAnnotation {
 					log.Printf("Found annotation for paragraph %d, word %d: %s", i, j, annotation.Keyword)
 					// If the annotation is within the range, add the ID
@@ -360,13 +358,13 @@ func getAnnotatedIntel(id string) (AnnotatedIntel, error){
 		}
 	}
 	log.Println("Annotated content created successfully")
-	
+
 	return AnnotatedIntel{
 		CreatedAt:   full.CreatedAt,
 		Title:       full.Title,
 		Description: full.Description,
 		Content:     annotatedContent,
-	}, nil	
+	}, nil
 
 }
 
@@ -397,15 +395,14 @@ func getAnnotations(intelID string) ([]Annotation, error) {
 		return nil, err
 	}
 
-	
 	annotations := make([]Annotation, 0, len(files))
 
 	for _, file := range files {
-		
+
 		if file.IsDir() {
-			continue;
+			continue
 		}
-		
+
 		filePath := annotationsDir + "/" + file.Name()
 		fileContent, err := os.ReadFile(filePath)
 		if err != nil {
@@ -421,7 +418,7 @@ func getAnnotations(intelID string) ([]Annotation, error) {
 
 		annotation.UpdatedAt = strings.TrimSuffix(file.Name(), ".json") // Use the file name as the updated_at field
 		annotations = append(annotations, annotation)
-	
+
 	}
 
 	return annotations, nil
@@ -444,7 +441,7 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	annotations,err := getAnnotations(intelID)
+	annotations, err := getAnnotations(intelID)
 	if err != nil {
 		http.Error(w, "Failed to read annotations", http.StatusInternalServerError)
 		log.Println("Error reading annotations:", err)
@@ -461,7 +458,6 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Intel annotation page rendered successfully")
 }
-
 
 func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling new annotation submission")
@@ -519,7 +515,6 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 
@@ -554,37 +549,4 @@ func Register() {
 	http.HandleFunc("POST /intel/create", HandleNewIntel)
 	http.HandleFunc("GET /intel/annotate/{id}", HandleAnnotate)
 	http.HandleFunc("POST /intel/annotate/{id}", HandleNewAnnotation)
-	
-	// test getAnnotatedIntel function
-	allIntel, err := getAllIntelShorts() // This is just a placeholder call to demonstrate the function's existence
-	if err != nil {
-		log.Println("No intel data found")	
-	}
-	firstIntel := allIntel[0].CreatedAt // Assuming you want to use the first intel as a placeholder
-	// inspect the intel data
-	log.Println("Intel data inspection complete. First Intel CreatedAt:", firstIntel)
-	log.Println("Intel data inspection complete. Number of Intel entries:", len(allIntel))
-	log.Println("Intel data inspection complete. First Intel Title:", allIntel[0].Title)
-	log.Println("Intel data inspection complete. First Intel Description:", allIntel[0].Description)
-
-	annotated, err := getAnnotatedIntel(firstIntel) // This is just a placeholder call to demonstrate the function's existence
-	if err != nil {
-		log.Println("No annotated intel data found")
-		return
-	}
-	log.Println("Annotated Intel data inspection complete. Title:", annotated.Title)
-	log.Println("Annotated Intel data inspection complete. Description:", annotated.Description)
-	log.Println("Annotated Intel data inspection complete. CreatedAt:", annotated.CreatedAt)
-	log.Println("Annotated Intel data inspection complete. Content length:", len(annotated.Content))
-	log.Println("Annotated Intel data inspection complete. Content first paragraph length:", len(annotated.Content[0]))
-	log.Println("Annotated Intel data inspection complete. Content first paragraph first word:", annotated.Content[0][0].Word)
-	log.Println("Annotated Intel data inspection complete. Number of annotations in first paragraph first word:", len(annotated.Content[0][0].AnnotationIDs))	
-
-
-
-	// Pretty print with field names
-	fmt.Printf("%+v\n", annotated)
-
-	// Even more detailed with type info
-    // fmt.Printf("%#v\n", annotated)
 }
