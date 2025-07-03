@@ -289,12 +289,72 @@ func getAnnotatedIntel(id string) (AnnotatedIntel, error){
 				Word:        word,
 				AnnotationIDs: []string{}, // Initialize with an empty slice
 			}
-			// Check if there are annotations for this word
+			// Check if there are annotations for this sequence of words
 			for _, annotation := range annotations {
-				if annotation.StartParagraph == strconv.Itoa(i) && annotation.StartWord == strconv.Itoa(j) {
+				log.Printf("Checking annotation: %+v for paragraph %d, word %d", annotation, i, j)
+				
+				// Convert string indices to integers for proper comparison
+				startParagraph, err := strconv.Atoi(annotation.StartParagraph)
+				if err != nil {
+					log.Printf("Error converting start paragraph to int: %v", err)
+					continue
+				}
+				endParagraph, err := strconv.Atoi(annotation.EndParagraph)
+				if err != nil {
+					log.Printf("Error converting end paragraph to int: %v", err)
+					continue
+				}
+				startWord, err := strconv.Atoi(annotation.StartWord)
+				if err != nil {
+					log.Printf("Error converting start word to int: %v", err)
+					continue
+				}
+				endWord, err := strconv.Atoi(annotation.EndWord)
+				if err != nil {
+					log.Printf("Error converting end word to int: %v", err)
+					continue
+				}
+				
+				// Check if current position is within annotation range
+				isWithinAnnotation := false
+				
+				if i < startParagraph {
+					// Current paragraph is before start paragraph
+					log.Printf("Skipping annotation for paragraph %d, word %d: before start paragraph", i, j)
+					continue
+				}
+				if i > endParagraph {
+					// Current paragraph is after end paragraph
+					log.Printf("Skipping annotation for paragraph %d, word %d: after end paragraph", i, j)
+					continue
+				}
+				
+				if i == startParagraph && i == endParagraph {
+					// Annotation is within the same paragraph
+					if j >= startWord && j <= endWord {
+						isWithinAnnotation = true
+					}
+				} else if i == startParagraph {
+					// Current paragraph is the start paragraph
+					if j >= startWord {
+						isWithinAnnotation = true
+					}
+				} else if i == endParagraph {
+					// Current paragraph is the end paragraph
+					if j <= endWord {
+						isWithinAnnotation = true
+					}
+				} else {
+					// Current paragraph is between start and end paragraphs
+					isWithinAnnotation = true
+				}
+				
+				if isWithinAnnotation {
 					log.Printf("Found annotation for paragraph %d, word %d: %s", i, j, annotation.Keyword)
-					// If the annotation starts at this word, add its ID to the list
+					// If the annotation is within the range, add the ID
 					annotatedContent[i][j].AnnotationIDs = append(annotatedContent[i][j].AnnotationIDs, annotation.UpdatedAt)
+				} else {
+					log.Printf("Skipping annotation for paragraph %d, word %d: not within range", i, j)
 				}
 			}
 		}
