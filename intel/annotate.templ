@@ -13,7 +13,12 @@ templ IntelParagraph(line []string) {
 
 templ experimentalParagraph(line []AnnotatedWord) {
 	for index, part := range line {
-		<span data-word={ index } data-annotations={ strings.Join(part.AnnotationIDs, ",") } data-marked={ len(part.AnnotationIDs) } >
+		<span 
+			data-word={ index } 
+			data-annotations={ strings.Join(part.AnnotationIDs, ",") } 
+			data-marked={ len(part.AnnotationIDs) } 
+			data-keywords={ strings.Join(part.Keywords, ",") }
+			title={ "keywords: " + strings.Join(part.Keywords, ", ") }>
 			{ part.Word + " " }
 		</span>
 	}

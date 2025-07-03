@@ -51,8 +51,8 @@ type Annotation struct {
 
 type AnnotatedWord struct {
 	Word          string   `json:"word"`
-	AnnotationIDs []string `json:"annotation_id"` // These are the IDs of the annotations that apply to this word
-	Keyword 	 string   `json:"keyword,omitempty"` // Optional keyword for the word, if applicable
+	AnnotationIDs []string `json:"annotation_id"`     // These are the IDs of the annotations that apply to this word
+	Keywords      []string `json:"keyword,omitempty"` // Optional keyword for the word, if applicable
 }
 
 type AnnotatedIntel struct {
@@ -351,7 +351,9 @@ func getAnnotatedIntel(id string) (AnnotatedIntel, error) {
 				if isWithinAnnotation {
 					log.Printf("Found annotation for paragraph %d, word %d: %s", i, j, annotation.Keyword)
 					// If the annotation is within the range, add the ID
-					annotatedContent[i][j].AnnotationIDs = append(annotatedContent[i][j].AnnotationIDs, annotation.UpdatedAt, annotation.Keyword)
+					annotatedContent[i][j].AnnotationIDs = append(annotatedContent[i][j].AnnotationIDs, annotation.UpdatedAt)
+					annotatedContent[i][j].Keywords = append(annotatedContent[i][j].Keywords, annotation.Keyword)
+					log.Printf("Annotated word: %+v", annotatedContent[i][j])
 				} else {
 					log.Printf("Skipping annotation for paragraph %d, word %d: not within range", i, j)
 				}
