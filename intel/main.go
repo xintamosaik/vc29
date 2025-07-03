@@ -50,6 +50,18 @@ type Annotation struct {
 	UpdatedAt      string `json:"updated_at"` // We do not need created_at, because we use the file name as a timestamp
 }
 
+type AnnotatedWord struct {
+	Word        string `json:"word"`
+	AnnotationIDs []string `json:"annotation_id"` // These are the IDs of the annotations that apply to this word
+}
+
+type AnnotatedIntel struct {
+	CreatedAt   string
+	Title       string
+	Description string
+	Content     [][]AnnotatedWord `json:"content"` // This is a slice of slices of AnnotatedWord, where each AnnotatedWord contains the word and its annotations
+}
+
 // This function handles the submission of new intel data.
 // It processes the form data, creates a new IntelJSON object,
 // saves it as a JSON file in the data/intel directory, and then renders the Intel index page.
@@ -242,6 +254,38 @@ func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getAnnotatedIntel(id string) (AnnotatedIntel, error){
+	// This function is a placeholder for future implementation.
+	// It could be used to retrieve annotated intel data based on the provided ID.
+	// Currently, it does not perform any operations.
+	log.Println("getAnnotatedIntel called with ID:", id)
+	if id == "" {
+		log.Println("No Intel ID provided")
+		return AnnotatedIntel{}, nil
+	}
+
+	full, err := getIntelFull(directory + "/" + id + ".json")
+	if err != nil {
+		log.Println("Error getting Intel full data:", err)
+		return AnnotatedIntel{}, err
+	}
+	log.Println("Intel data retrieved successfully:", full.Title)
+
+	annotations, err := getAnnotations(id)
+	if err != nil {
+		log.Println("Error getting annotations for Intel ID:", id, err)
+		return AnnotatedIntel{}, err
+	}
+
+	log.Println("Annotations retrieved successfully for Intel ID:", id)
+	log.Println("Number of annotations:", len(annotations)) // result of len: 4 - good!
+
+
+
+	return AnnotatedIntel{}, nil
+
+}
+
 // stampToDate converts a timestamp string to a formatted date string.
 // It expects the timestamp to be in seconds since the Unix epoch.
 // The returned date is formatted as "2006-01-02 15:04:05".
@@ -426,4 +470,12 @@ func Register() {
 	http.HandleFunc("POST /intel/create", HandleNewIntel)
 	http.HandleFunc("GET /intel/annotate/{id}", HandleAnnotate)
 	http.HandleFunc("POST /intel/annotate/{id}", HandleNewAnnotation)
+	
+	// test getAnnotatedIntel function
+	allIntel, err := getAllIntelShorts() // This is just a placeholder call to demonstrate the function's existence
+	if err != nil {
+		log.Println("No intel data found")	
+	}
+	firstIntel := allIntel[0].CreatedAt // Assuming you want to use the first intel as a placeholder
+	getAnnotatedIntel(firstIntel) // This is just a placeholder call to demonstrate the function's existence
 }
