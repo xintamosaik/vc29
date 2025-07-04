@@ -247,7 +247,7 @@ func getAnnotatedIntel(id string) (annotations.AnnotatedIntel, error) {
 	}
 	log.Println("Intel data retrieved successfully:", full.Title)
 
-	ann, err := annotations.GetAnnotations(id)
+	ann, err := annotations.GetAll(id)
 	if err != nil {
 		log.Println("Error getting annotations for Intel ID:", id, err)
 		return annotations.AnnotatedIntel{}, err
@@ -376,7 +376,7 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	annotations, err := annotations.GetAnnotations(intelID)
+	annotations, err := annotations.GetAll(intelID)
 	if err != nil {
 		http.Error(w, "Failed to read annotations", http.StatusInternalServerError)
 		log.Println("Error reading annotations:", err)
@@ -431,7 +431,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt:      timestamp,
 	}
 
-	err := annotations.CreateAnnotation(intelID, annotation)
+	err := annotations.Save(intelID, annotation)
 	if err != nil {
 		http.Error(w, "Failed to create annotation", http.StatusInternalServerError)
 		log.Println("Error creating annotation:", err)
@@ -442,7 +442,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 
 	ann := make([]annotations.Annotation, 0)
 
-	ann, err = annotations.GetAnnotations(intelID)
+	ann, err = annotations.GetAll(intelID)
 	if err != nil {
 		http.Error(w, "Failed to read annotations", http.StatusInternalServerError)
 		log.Println("Error reading annotations:", err)

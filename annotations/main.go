@@ -33,7 +33,7 @@ type AnnotatedIntel struct {
 
 const directoryAnnotations = "data/annotations"
 
-func CreateAnnotation(intelID string, annotation Annotation) error {
+func Save(intelID string, annotation Annotation) error {
 
 	// Create the annotations directory if it doesn't exist
 	if err := os.MkdirAll(directoryAnnotations+"/"+intelID, 0755); err != nil {
@@ -63,7 +63,7 @@ func CreateAnnotation(intelID string, annotation Annotation) error {
 	return nil
 }
 
-func GetAnnotations(intelID string) ([]Annotation, error) {
+func GetAll(intelID string) ([]Annotation, error) {
 	annotationsDir := directoryAnnotations + "/" + intelID
 
 	if err := os.MkdirAll(annotationsDir, 0755); err != nil {
