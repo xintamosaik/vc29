@@ -10,19 +10,23 @@ templ IntelParagraph(line []string) {
 		<span data-word={ index }>{ part + " " }</span>
 	}
 }
+
 templ annotatedWord(index int, part AnnotatedWord) {
 	<span
-	data-word={ index }
-	data-annotations={ strings.Join(part.AnnotationIDs, ",") }
-	data-marked={ len(part.AnnotationIDs) }
-	data-keywords={ strings.Join(part.Keywords, ",") }
-	title={ "keywords: " + strings.Join(part.Keywords, ", " ) }>
-	{ part.Word + " " }
-</span>
+		data-word={ index }
+		data-annotations={ strings.Join(part.AnnotationIDs, ",") }
+		data-marked={ len(part.AnnotationIDs) }
+		data-keywords={ strings.Join(part.Keywords, ",") }
+		title={ "keywords: " + strings.Join(part.Keywords, ", ") }
+	>
+		{ part.Word + " " }
+	</span>
 }
+
 templ plainWord(index int, word string) {
 	<span data-word={ index }>{ word + " " }</span>
-} 
+}
+
 templ experimentalParagraph(line []AnnotatedWord) {
 	for index, part := range line {
 		if len(part.AnnotationIDs) == 0 {
@@ -65,14 +69,11 @@ templ Annotate(annotations []Annotation, annotatedIntel AnnotatedIntel) {
 	<hr/>
 	<br/>
 	<div id="content" onmouseup="handleAnnotateMouseUp(event)">
-		<h3>Experimental Intel</h3>
-		<p>
-			This is an experimental version of the intel with annotations.
-			It is not yet finalized and may contain errors.
-			Please review the annotations carefully.
-		</p>
 		@experiment(annotatedIntel)
 	</div>
+	<br/>
+	<hr/>
+	<br/>
 	<div id="annotations">
 		for _, annotation := range annotations {
 			<div
@@ -92,9 +93,6 @@ templ Annotate(annotations []Annotation, annotatedIntel AnnotatedIntel) {
 			</div>
 		}
 	</div>
-	<br/>
-	<hr/>
-	<br/>
 	<div id="send_annotation" popover>
 		<form hx-target="#root" hx-swap="innerHTML" hx-post={ "/intel/annotate/" + annotatedIntel.CreatedAt }>
 			<h2>Add Annotation</h2>
