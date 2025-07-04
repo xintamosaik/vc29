@@ -25,12 +25,14 @@ type AnnotatedWord struct {
 }
 
 type AnnotatedIntel struct {
-	CreatedAt   string `json:"created_at"` // This is a timestamp in string format, e.g., "1633072800"
-	Title       string `json:"title"`
-	Description string `json:"description"`
+	CreatedAt   string            `json:"created_at"` // This is a timestamp in string format, e.g., "1633072800"
+	Title       string            `json:"title"`
+	Description string            `json:"description"`
 	Content     [][]AnnotatedWord `json:"content"` // This is a slice of slices of AnnotatedWord, where each AnnotatedWord contains the word and its annotations
 }
+
 const directoryAnnotations = "data/annotations"
+
 func CreateAnnotation(intelID string, annotation Annotation) error {
 
 	// Create the annotations directory if it doesn't exist
@@ -45,17 +47,15 @@ func CreateAnnotation(intelID string, annotation Annotation) error {
 	annotationFileName := directoryAnnotations + "/" + intelID + "/" + annotation.UpdatedAt + ".json"
 	annotationFile, err := os.Create(annotationFileName)
 	if err != nil {
-	
+
 		log.Println("Error creating annotation file:", err)
 		return err
 	}
 	defer annotationFile.Close()
 
-
-
 	encoder := json.NewEncoder(annotationFile)
 	if err := encoder.Encode(annotation); err != nil {
-	
+
 		log.Println("Error encoding annotation JSON:", err)
 		return err
 	}
@@ -66,7 +66,6 @@ func CreateAnnotation(intelID string, annotation Annotation) error {
 func GetAnnotations(intelID string) ([]Annotation, error) {
 	annotationsDir := directoryAnnotations + "/" + intelID
 
-	
 	if err := os.MkdirAll(annotationsDir, 0755); err != nil {
 		log.Printf("Error creating annotations directory %s: %v", annotationsDir, err)
 		return nil, err
@@ -106,4 +105,3 @@ func GetAnnotations(intelID string) ([]Annotation, error) {
 
 	return annotations, nil
 }
-

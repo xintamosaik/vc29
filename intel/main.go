@@ -10,12 +10,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/xintamosaik/vc29/annotations"
 	"github.com/a-h/templ"
+	"github.com/xintamosaik/vc29/annotations"
 )
 
 const directory = "data/intel"
-
 
 // IntelJSON represents the structure of the intel data stored in JSON files.
 type IntelJSON struct {
@@ -38,7 +37,6 @@ type IntelFull struct {
 	Description string
 	Content     [][]string
 }
-
 
 // This function handles the submission of new intel data.
 // It processes the form data, creates a new IntelJSON object,
@@ -232,27 +230,27 @@ func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getAnnotatedIntel(id string) ( annotations.AnnotatedIntel, error) {
+func getAnnotatedIntel(id string) (annotations.AnnotatedIntel, error) {
 	// This function is a placeholder for future implementation.
 	// It could be used to retrieve annotated intel data based on the provided ID.
 	// Currently, it does not perform any operations.
 	log.Println("getAnnotatedIntel called with ID:", id)
 	if id == "" {
 		log.Println("No Intel ID provided")
-		return  annotations.AnnotatedIntel{}, nil
+		return annotations.AnnotatedIntel{}, nil
 	}
 
 	full, err := getIntelFull(directory + "/" + id + ".json")
 	if err != nil {
 		log.Println("Error getting Intel full data:", err)
-		return  annotations.AnnotatedIntel{}, err
+		return annotations.AnnotatedIntel{}, err
 	}
 	log.Println("Intel data retrieved successfully:", full.Title)
 
 	ann, err := annotations.GetAnnotations(id)
 	if err != nil {
 		log.Println("Error getting annotations for Intel ID:", id, err)
-		return   annotations.AnnotatedIntel{}, err
+		return annotations.AnnotatedIntel{}, err
 	}
 
 	log.Println("Annotations retrieved successfully for Intel ID:", id)
@@ -367,7 +365,6 @@ func stampToDate(fileNameOnly string) (string, error) {
 	return date.Format("2006-01-02 15:04:05"), nil
 }
 
-
 // handleAnnotate is a view that gets an intel data and then allows users to add annotations to it.
 func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 	log.Println("Handling Intel annotation")
@@ -378,7 +375,6 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Intel ID is required", http.StatusBadRequest)
 		return
 	}
-
 
 	annotations, err := annotations.GetAnnotations(intelID)
 	if err != nil {
@@ -394,7 +390,7 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error getting annotated intel:", err)
 		return
 	}
-	err = Annotate( annotations, annotatedIntel).Render(context.Background(), w)
+	err = Annotate(annotations, annotatedIntel).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
 		log.Println("Error rendering annotation page:", err)
@@ -425,7 +421,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 	keyword := r.FormValue("keyword")
 	description := r.FormValue("description")
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	annotation :=  annotations.Annotation{
+	annotation := annotations.Annotation{
 		StartParagraph: startParagraph,
 		StartWord:      startWord,
 		EndParagraph:   endParagraph,
@@ -460,7 +456,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = Annotate( ann, annotatedIntel).Render(context.Background(), w)
+	err = Annotate(ann, annotatedIntel).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
 		log.Println("Error rendering annotation page:", err)
