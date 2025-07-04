@@ -10,11 +10,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/xintamosaik/vc29/annotations"
 	"github.com/a-h/templ"
 )
 
 const directory = "data/intel"
-const directoryAnnotations = "data/annotations"
+
 
 // IntelJSON represents the structure of the intel data stored in JSON files.
 type IntelJSON struct {
@@ -38,29 +39,6 @@ type IntelFull struct {
 	Content     [][]string
 }
 
-// Annotation represents an annotation on an intel data.
-type Annotation struct {
-	StartParagraph string `json:"start_paragraph"`
-	StartWord      string `json:"start_word"`
-	EndParagraph   string `json:"end_paragraph"`
-	EndWord        string `json:"end_word"`
-	Keyword        string `json:"keyword"`
-	Description    string `json:"description"`
-	UpdatedAt      string `json:"updated_at"` // We do not need created_at, because we use the file name as a timestamp
-}
-
-type AnnotatedWord struct {
-	Word          string   `json:"word"`
-	AnnotationIDs []string `json:"annotation_id"`     // These are the IDs of the annotations that apply to this word
-	Keywords      []string `json:"keyword,omitempty"` // Optional keyword for the word, if applicable
-}
-
-type AnnotatedIntel struct {
-	CreatedAt   string `json:"created_at"` // This is a timestamp in string format, e.g., "1633072800"
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Content     [][]AnnotatedWord `json:"content"` // This is a slice of slices of AnnotatedWord, where each AnnotatedWord contains the word and its annotations
-}
 
 // This function handles the submission of new intel data.
 // It processes the form data, creates a new IntelJSON object,
@@ -254,42 +232,42 @@ func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getAnnotatedIntel(id string) (AnnotatedIntel, error) {
+func getAnnotatedIntel(id string) ( annotations.AnnotatedIntel, error) {
 	// This function is a placeholder for future implementation.
 	// It could be used to retrieve annotated intel data based on the provided ID.
 	// Currently, it does not perform any operations.
 	log.Println("getAnnotatedIntel called with ID:", id)
 	if id == "" {
 		log.Println("No Intel ID provided")
-		return AnnotatedIntel{}, nil
+		return  annotations.AnnotatedIntel{}, nil
 	}
 
 	full, err := getIntelFull(directory + "/" + id + ".json")
 	if err != nil {
 		log.Println("Error getting Intel full data:", err)
-		return AnnotatedIntel{}, err
+		return  annotations.AnnotatedIntel{}, err
 	}
 	log.Println("Intel data retrieved successfully:", full.Title)
 
-	annotations, err := getAnnotations(id)
+	ann, err := annotations.GetAnnotations(id)
 	if err != nil {
 		log.Println("Error getting annotations for Intel ID:", id, err)
-		return AnnotatedIntel{}, err
+		return   annotations.AnnotatedIntel{}, err
 	}
 
 	log.Println("Annotations retrieved successfully for Intel ID:", id)
-	log.Println("Number of annotations:", len(annotations)) // result of len: 4 - good!
+	log.Println("Number of annotations:", len(ann)) // result of len: 4 - good!
 
-	annotatedContent := make([][]AnnotatedWord, len(full.Content))
+	annotatedContent := make([][]annotations.AnnotatedWord, len(full.Content))
 	for i, paragraph := range full.Content {
-		annotatedContent[i] = make([]AnnotatedWord, len(paragraph))
+		annotatedContent[i] = make([]annotations.AnnotatedWord, len(paragraph))
 		for j, word := range paragraph {
-			annotatedContent[i][j] = AnnotatedWord{
+			annotatedContent[i][j] = annotations.AnnotatedWord{
 				Word:          word,
 				AnnotationIDs: []string{}, // Initialize with an empty slice
 			}
 			// Check if there are annotations for this sequence of words
-			for _, annotation := range annotations {
+			for _, annotation := range ann {
 				log.Printf("Checking annotation: %+v for paragraph %d, word %d", annotation, i, j)
 
 				// Convert string indices to integers for proper comparison
@@ -362,7 +340,7 @@ func getAnnotatedIntel(id string) (AnnotatedIntel, error) {
 	}
 	log.Println("Annotated content created successfully")
 
-	return AnnotatedIntel{
+	return annotations.AnnotatedIntel{
 		CreatedAt:   full.CreatedAt,
 		Title:       full.Title,
 		Description: full.Description,
@@ -389,49 +367,6 @@ func stampToDate(fileNameOnly string) (string, error) {
 	return date.Format("2006-01-02 15:04:05"), nil
 }
 
-func getAnnotations(intelID string) ([]Annotation, error) {
-	annotationsDir := directoryAnnotations + "/" + intelID
-
-	
-	if err := os.MkdirAll(annotationsDir, 0755); err != nil {
-		log.Printf("Error creating annotations directory %s: %v", annotationsDir, err)
-		return nil, err
-	}
-
-	files, err := os.ReadDir(annotationsDir)
-	if err != nil { // This is very improbable, but we handle it anyway
-		log.Printf("Error reading annotations directory %s: %v", annotationsDir, err)
-		return nil, err
-	}
-
-	annotations := make([]Annotation, 0, len(files))
-
-	for _, file := range files {
-
-		if file.IsDir() {
-			continue
-		}
-
-		filePath := annotationsDir + "/" + file.Name()
-		fileContent, err := os.ReadFile(filePath)
-		if err != nil {
-			log.Printf("Error reading annotation file %s: %v", file.Name(), err)
-			continue
-		}
-
-		var annotation Annotation
-		if err := json.Unmarshal(fileContent, &annotation); err != nil {
-			log.Printf("Error unmarshalling annotation file %s: %v", file.Name(), err)
-			continue
-		}
-
-		annotation.UpdatedAt = strings.TrimSuffix(file.Name(), ".json") // Use the file name as the updated_at field
-		annotations = append(annotations, annotation)
-
-	}
-
-	return annotations, nil
-}
 
 // handleAnnotate is a view that gets an intel data and then allows users to add annotations to it.
 func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
@@ -445,7 +380,7 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 	}
 
 
-	annotations, err := getAnnotations(intelID)
+	annotations, err := annotations.GetAnnotations(intelID)
 	if err != nil {
 		http.Error(w, "Failed to read annotations", http.StatusInternalServerError)
 		log.Println("Error reading annotations:", err)
@@ -489,26 +424,8 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 	endWord := r.FormValue("end_word")
 	keyword := r.FormValue("keyword")
 	description := r.FormValue("description")
-
-	// Create the annotations directory if it doesn't exist
-	if err := os.MkdirAll(directoryAnnotations+"/"+intelID, 0755); err != nil {
-		http.Error(w, "Failed to create annotations directory", http.StatusInternalServerError)
-		log.Println("Error creating annotations directory:", err)
-		return
-	}
-
-	// We will use unix timestamps again for the annotation file name
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	annotationFileName := directoryAnnotations + "/" + intelID + "/" + timestamp + ".json"
-	annotationFile, err := os.Create(annotationFileName)
-	if err != nil {
-		http.Error(w, "Failed to create annotation file", http.StatusInternalServerError)
-		log.Println("Error creating annotation file:", err)
-		return
-	}
-	defer annotationFile.Close()
-
-	annotation := Annotation{
+	annotation :=  annotations.Annotation{
 		StartParagraph: startParagraph,
 		StartWord:      startWord,
 		EndParagraph:   endParagraph,
@@ -518,19 +435,18 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt:      timestamp,
 	}
 
-	encoder := json.NewEncoder(annotationFile)
-	if err := encoder.Encode(annotation); err != nil {
-		http.Error(w, "Failed to encode annotation JSON", http.StatusInternalServerError)
-		log.Println("Error encoding annotation JSON:", err)
+	err := annotations.CreateAnnotation(intelID, annotation)
+	if err != nil {
+		http.Error(w, "Failed to create annotation", http.StatusInternalServerError)
+		log.Println("Error creating annotation:", err)
 		return
 	}
-
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 
-	annotations := make([]Annotation, 0)
+	ann := make([]annotations.Annotation, 0)
 
-	annotations, err = getAnnotations(intelID)
+	ann, err = annotations.GetAnnotations(intelID)
 	if err != nil {
 		http.Error(w, "Failed to read annotations", http.StatusInternalServerError)
 		log.Println("Error reading annotations:", err)
@@ -544,7 +460,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = Annotate( annotations, annotatedIntel).Render(context.Background(), w)
+	err = Annotate( ann, annotatedIntel).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
 		log.Println("Error rendering annotation page:", err)

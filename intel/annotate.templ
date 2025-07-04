@@ -2,6 +2,7 @@ package intel
 
 import (
 	"github.com/xintamosaik/vc29/navigation"
+	"github.com/xintamosaik/vc29/annotations"
 	"strings"
 )
 
@@ -11,7 +12,7 @@ templ IntelParagraph(line []string) {
 	}
 }
 
-templ annotatedWord(index int, part AnnotatedWord) {
+templ annotatedWord(index int, part annotations.AnnotatedWord) {
 	<span
 		data-word={ index }
 		data-annotations={ strings.Join(part.AnnotationIDs, ",") }
@@ -27,7 +28,7 @@ templ plainWord(index int, word string) {
 	<span data-word={ index }>{ word + " " }</span>
 }
 
-templ experimentalParagraph(line []AnnotatedWord) {
+templ experimentalParagraph(line [] annotations.AnnotatedWord) {
 	for index, part := range line {
 		if len(part.AnnotationIDs) == 0 {
 			@plainWord(index, part.Word)
@@ -37,7 +38,7 @@ templ experimentalParagraph(line []AnnotatedWord) {
 	}
 }
 
-templ experiment(annotatedIntel AnnotatedIntel) {
+templ experiment(annotatedIntel  annotations.AnnotatedIntel) {
 	for index, intel := range annotatedIntel.Content {
 		if len(intel) == 0 {
 			<span data-word="0"></span>
@@ -49,7 +50,7 @@ templ experiment(annotatedIntel AnnotatedIntel) {
 	}
 }
 
-templ Annotate(annotations []Annotation, annotatedIntel AnnotatedIntel) {
+templ Annotate(annotations [] annotations.Annotation, annotatedIntel  annotations.AnnotatedIntel) {
 	@navigation.Main("")
 	<h2>
 		<span>
