@@ -13,28 +13,14 @@
 </head>
 
 <body style="background-color: var(--color-background); color: var(--color-primary); font-family: sans-serif;">
-    
+
     <nav class="navigation main" id="main_navigation" onclick="setActive(event)">
-        <a hx-get="/home" hx-swap="innerHTML" hx-target="#root" >Home</a>
+        <a hx-get="/home" hx-swap="innerHTML" hx-target="#root">Home</a>
         <a hx-get="/intel" hx-swap="innerHTML" hx-target="#root" class="active">Intel</a>
         <a hx-get="/signals" hx-swap="innerHTML" hx-target="#root">Signals</a>
         <a hx-get="/drafts" hx-swap="innerHTML" hx-target="#root">Drafts</a>
     </nav>
-    <script>
 
-        const navigation = window.main_navigation;
-        const links = navigation.querySelectorAll('a');
-        function setActive(event) {
-            console.log(event)
-            console.log(links)
-            if (event.target.tagName !== 'A') {
-                return;
-            }
-            links.forEach(link => link.classList.remove('active'));
-
-            event.target.classList.add('active');
-        }
-    </script>
     <main id="root" hx-trigger="load" hx-get="/home" hx-swap="innerHTML"
         style="width: min(64ch, 100%); margin: 0 auto;"></main>
 
