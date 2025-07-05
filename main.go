@@ -17,14 +17,22 @@ import (
 
 const port = ":3000"
 const directoryData = "data"
-const directory = "data/intel"
-const directoryAnnotations = "data/annotations"
+const directoryIntel = directoryData + "/intel"
+const directoryAnnotations = directoryData + "/annotations"
 
 func main() {
 
 	// Housekeeping: Create a data directory if it doesn't exist
 	if err := os.MkdirAll("data", 0755); err != nil {
 		log.Fatalf("Failed to create data directory: %v", err)
+	}
+
+	if err := os.MkdirAll(directoryIntel, 0755); err != nil {
+		log.Fatalf("Failed to create data/intel directory: %v", err)
+	}
+
+	if err := os.MkdirAll(directoryAnnotations, 0755); err != nil {
+		log.Fatalf("Failed to create data/annotations directory: %v", err)
 	}
 
 	// Bundle the JavaScript and CSS files using esbuild
@@ -142,13 +150,13 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Add the data/intel directory
-	if err := os.MkdirAll(directory, 0755); err != nil {
+	if err := os.MkdirAll(directoryIntel, 0755); err != nil {
 		log.Fatalf("Failed to create data/intel directory: %v", err)
 	}
 
 	// save as JSON file with timestamp converted to string
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	fileName := directory + "/" + timestamp + ".json"
+	fileName := directoryIntel + "/" + timestamp + ".json"
 	file, err := os.Create(fileName)
 	if err != nil {
 		http.Error(w, "Failed to create file", http.StatusInternalServerError)
@@ -205,7 +213,7 @@ func getIntelFull(fileName string) (IntelFull, error) {
 	}
 
 	trimmedFileName := strings.TrimSuffix(fileName, ".json")
-	fileNameOnly := strings.TrimPrefix(trimmedFileName, directory+"/") // Whhich is a unix time stamp
+	fileNameOnly := strings.TrimPrefix(trimmedFileName, directoryIntel+"/") // Whhich is a unix time stamp
 
 	intelFull.CreatedAt = fileNameOnly
 	intelFull.Description = intel.Description
@@ -237,7 +245,7 @@ func getIntelShort(fileName string) (IntelShort, error) {
 	}
 
 	trimmedFileName := strings.TrimSuffix(fileName, ".json")
-	fileNameOnly := strings.TrimPrefix(trimmedFileName, directory+"/") // Whhich is a unix time stamp
+	fileNameOnly := strings.TrimPrefix(trimmedFileName, directoryIntel+"/") // Whhich is a unix time stamp
 
 	intelShort.CreatedAt = fileNameOnly
 	intelShort.Description = intel.Description
@@ -252,7 +260,7 @@ func getIntelShort(fileName string) (IntelShort, error) {
 //
 // It returns a slice of IntelShort objects and an error if any.
 func getAllIntelShorts() ([]IntelShort, error) {
-	files, err := os.ReadDir(directory)
+	files, err := os.ReadDir(directoryIntel)
 	if err != nil {
 		return nil, err
 	}
@@ -261,7 +269,7 @@ func getAllIntelShorts() ([]IntelShort, error) {
 
 	for _, file := range files {
 		if !file.IsDir() {
-			intel, err := getIntelShort(directory + "/" + file.Name())
+			intel, err := getIntelShort(directoryIntel + "/" + file.Name())
 			if err != nil {
 				log.Printf("Error reading file %s: %v", file.Name(), err)
 				continue
@@ -521,7 +529,7 @@ func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 		return AnnotatedIntel{}, nil
 	}
 
-	full, err := getIntelFull(directory + "/" + id + ".json")
+	full, err := getIntelFull(directoryIntel + "/" + id + ".json")
 	if err != nil {
 		log.Println("Error getting Intel full data:", err)
 		return AnnotatedIntel{}, err
