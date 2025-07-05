@@ -72,8 +72,7 @@ func main() {
 	http.HandleFunc("POST /intel/annotate/{id}", HandleNewAnnotation)
 	http.Handle("GET /drafts", templ.Handler(Drafts()))
 	http.Handle("GET /signals", templ.Handler(Signals()))
-	http.Handle("GET /about", templ.Handler(About()))
-	http.Handle("GET /contact", templ.Handler(Contact()))
+
 
 	// Start the HTTP server
 	fmt.Println("Starting server on http://localhost" + port)
