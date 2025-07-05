@@ -7,7 +7,6 @@
 
 #intel_list .item {
     display: flex;
-    flex-wrap: wrap;
     justify-content: stretch;
     outline: 1px solid transparent;
     outline-offset: 1ch;
