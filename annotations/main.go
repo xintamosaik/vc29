@@ -34,15 +34,17 @@ type AnnotatedIntel struct {
 const directoryAnnotations = "data/annotations"
 
 func Save(intelID string, annotation Annotation) error {
+	if intelID == "" {
+		log.Println("Intel ID is empty or invalid")
+		return os.ErrInvalid
+	}
+	intelID = strings.ReplaceAll(intelID, "..", "")
+	intelID = strings.TrimSpace(intelID)
 
-	// Create the annotations directory if it doesn't exist
-	if err := os.MkdirAll(directoryAnnotations+"/"+intelID, 0755); err != nil {
-
+	if err := os.MkdirAll(directoryAnnotations+ "/" + intelID, 0755); err != nil {
 		log.Println("Error creating annotations directory:", err)
 		return err
 	}
-
-	// We will use unix timestamps again for the annotation file name
 
 	annotationFileName := directoryAnnotations + "/" + intelID + "/" + annotation.UpdatedAt + ".json"
 	annotationFile, err := os.Create(annotationFileName)
@@ -78,9 +80,7 @@ func GetAll(intelID string) ([]Annotation, error) {
 	}
 
 	annotations := make([]Annotation, 0, len(files))
-
 	for _, file := range files {
-
 		if file.IsDir() {
 			continue
 		}
@@ -98,9 +98,8 @@ func GetAll(intelID string) ([]Annotation, error) {
 			continue
 		}
 
-		annotation.UpdatedAt = strings.TrimSuffix(file.Name(), ".json") // Use the file name as the updated_at field
+	
 		annotations = append(annotations, annotation)
-
 	}
 
 	return annotations, nil
