@@ -1,8 +1,8 @@
-@import './interal/forms.css';
-@import './interal/colors.css';
-@import './interal/navigation.css';
-@import './interal/intel.css';
-@import './interal/annotate.css';
+@import './forms.css';
+@import './colors.css';
+@import './navigation.css';
+@import './intel.css';
+@import './annotate.css';
 
 * {
     box-sizing: border-box;
