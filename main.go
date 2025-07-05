@@ -73,8 +73,12 @@ func main() {
 	})
 
 	http.Handle("GET /home", templ.Handler(Home()))
-	http.HandleFunc("GET /intel", HandleIntelIndex)
+	http.Handle("GET /intel", templ.Handler(Intel()))
+	
+	http.HandleFunc("GET /intel/list", HandleIntelIndex)
+	
 	http.Handle("GET /intel/new", templ.Handler(New()))
+
 	http.HandleFunc("POST /intel/create", HandleNewIntel)
 	http.HandleFunc("GET /intel/annotate/{id}", HandleAnnotate)
 	http.HandleFunc("POST /intel/annotate/{id}", HandleNewAnnotation)
@@ -184,7 +188,7 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = Intel(intelShorts).Render(context.Background(), w)
+	err = IntelList(intelShorts).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render intel page", http.StatusInternalServerError)
 		log.Println("Error rendering intel page:", err)
@@ -297,7 +301,7 @@ func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = Intel(intelShorts).Render(context.Background(), w)
+	err = IntelList(intelShorts).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render intel page", http.StatusInternalServerError)
 		log.Println("Error rendering intel page:", err)

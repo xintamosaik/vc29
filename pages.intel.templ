@@ -1,31 +1,10 @@
 package main
 
-templ Intel(intel []IntelShort) {
+templ Intel() {
 	
 	@navigation("intel")
 	@link("/intel/new", "Add new intel")
 	<br/>
 	<br/>
-	for _, item := range intel {
-		<div id="intel_list">
-			<div class="item">
-				<div class="short">
-					<h2>
-						{ item.Title }
-					</h2>
-					<h3>
-						{ item.Description }
-					</h3>
-					<p>
-						{ stampToDate(item.CreatedAt) }
-					</p>
-				</div>
-				<div class="actions">
-					@link("/intel/view/" + item.CreatedAt, "view")
-                    @link("/intel/annotate/" + item.CreatedAt, "annotate")
-                    @link("/intel/delete/" + item.CreatedAt, "delete")
-				</div>
-			</div>
-		</div>
-	}
+	<div hx-trigger="load" hx-get="/intel/list"  hx-swap="outerHTML"></div>
 }

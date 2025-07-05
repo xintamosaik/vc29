@@ -1,0 +1,26 @@
+package main
+
+templ IntelList(intel []IntelShort) {
+	for _, item := range intel {
+		<div id="intel_list">
+			<div class="item">
+				<div class="short">
+					<h2>
+						{ item.Title }
+					</h2>
+					<h3>
+						{ item.Description }
+					</h3>
+					<p>
+						{ stampToDate(item.CreatedAt) }
+					</p>
+				</div>
+				<div class="actions">
+					@link("/intel/view/" + item.CreatedAt, "view")
+                    @link("/intel/annotate/" + item.CreatedAt, "annotate")
+                    @link("/intel/delete/" + item.CreatedAt, "delete")
+				</div>
+			</div>
+		</div>
+	}
+}
