@@ -1,4 +1,4 @@
-package navigation
+package main
 
 type Route struct {
 	Path  string
@@ -14,14 +14,14 @@ var routes = []Route{
 	{"about", "About"},
 }
 
-templ Main(active string) {
+templ navigation(active string) {
 
 	<nav class="navigation main">
 		for _, route := range routes {
 			if route.Path == active {
-				@Unlink(route.Title)
+				@unlink(route.Title)
 			} else {
-				@Link("/"+route.Path, route.Title)
+				@link("/"+route.Path, route.Title)
 			}
 		}
 	</nav>
