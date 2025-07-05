@@ -15,13 +15,5 @@ var routes = []Route{
 
 templ navigation(active string) {
 
-	<nav class="navigation main">
-		for _, route := range routes {
-			if route.Path == active {
-				@unlink(route.Title)
-			} else {
-				@link("/"+route.Path, route.Title)
-			}
-		}
-	</nav>
+
 }

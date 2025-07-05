@@ -8,20 +8,21 @@ nav.navigation.main {
         text-decoration: none;
         text-transform: uppercase;
         padding: 2ch;
-        border: 1px solid var(--color-primary);
-        cursor: default;
-        user-select: none;
-    }
 
-    a[href] {
-        border: 1px solid transparent;
         cursor: pointer;
+        border: 1px solid transparent;
         color: var(--color-primary);
     }
 
-    a[href]:hover {
+    a.active {
         background-color: var(--color-primary);
         color: var(--color-background);
+        user-select: none;
+        cursor: default;
+    }
+
+    a:hover {
+        border: 1px solid var(--color-primary);
     }
 
 }
