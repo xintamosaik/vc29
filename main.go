@@ -74,7 +74,7 @@ func main() {
 	http.HandleFunc("POST /intel/annotate/{id}", HandleNewAnnotation)
 
 	http.Handle("GET /drafts", templ.Handler(pages.Drafts()))
-	
+
 	http.Handle("GET /signals", templ.Handler(pages.Signals()))
 
 	// Start the HTTP server
@@ -212,21 +212,14 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	startParagraph := r.FormValue("start_paragraph")
-	startWord := r.FormValue("start_word")
-	endParagraph := r.FormValue("end_paragraph")
-	endWord := r.FormValue("end_word")
-	keyword := r.FormValue("keyword")
-	description := r.FormValue("description")
-	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	annotation := model.Annotation{
-		StartParagraph: startParagraph,
-		StartWord:      startWord,
-		EndParagraph:   endParagraph,
-		EndWord:        endWord,
-		Keyword:        keyword,
-		Description:    description,
-		UpdatedAt:      timestamp,
+		StartParagraph: r.FormValue("start_paragraph"),
+		StartWord:      r.FormValue("start_word"),
+		EndParagraph:   r.FormValue("end_paragraph"),
+		EndWord:        r.FormValue("end_word"),
+		Keyword:        r.FormValue("keyword"),
+		Description:    r.FormValue("description"),
+		UpdatedAt:      strconv.FormatInt(time.Now().Unix(), 10),
 	}
 
 	err := model.SaveAnnotation(intelID, annotation)
