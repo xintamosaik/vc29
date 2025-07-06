@@ -1,4 +1,4 @@
-package main
+package pages
 
 import (
 	"strings"
@@ -37,7 +37,7 @@ templ experimentalParagraph(line []model.AnnotatedWord) {
 	}
 }
 
-templ experiment(annotatedIntel AnnotatedIntel) {
+templ experiment(annotatedIntel model.AnnotatedIntel) {
 	for index, intel := range annotatedIntel.Content {
 		if len(intel) == 0 {
 			<span data-word="0"></span>
@@ -49,7 +49,7 @@ templ experiment(annotatedIntel AnnotatedIntel) {
 	}
 }
 
-templ Annotate(annotations []model.Annotation, annotatedIntel AnnotatedIntel) {
+templ Annotate(annotations []model.Annotation, annotatedIntel model.AnnotatedIntel) {
 	<h2>
 		<span>
 			Annotate Intel:

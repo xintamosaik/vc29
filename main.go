@@ -15,6 +15,7 @@ import (
 	"github.com/evanw/esbuild/pkg/api"
 
 	"github.com/xintamosaik/vc29/model"
+	"github.com/xintamosaik/vc29/pages"
 )
 
 const port = ":3000"
@@ -63,8 +64,8 @@ func main() {
 		http.ServeFile(w, r, "dist.css")
 	})
 
-	http.Handle("GET /home", templ.Handler(Home()))
-	http.Handle("GET /intel", templ.Handler(Intel()))
+	http.Handle("GET /home", templ.Handler(pages.Home()))
+	http.Handle("GET /intel", templ.Handler(pages.Intel()))
 
 	http.HandleFunc("GET /intel/list", HandleIntelIndex)
 
@@ -73,8 +74,8 @@ func main() {
 	http.HandleFunc("POST /intel/create", HandleNewIntel)
 	http.HandleFunc("GET /intel/annotate/{id}", HandleAnnotate)
 	http.HandleFunc("POST /intel/annotate/{id}", HandleNewAnnotation)
-	http.Handle("GET /drafts", templ.Handler(Drafts()))
-	http.Handle("GET /signals", templ.Handler(Signals()))
+	http.Handle("GET /drafts", templ.Handler(pages.Drafts()))
+	http.Handle("GET /signals", templ.Handler(pages.Signals()))
 
 	// Start the HTTP server
 	fmt.Println("Starting server on http://localhost" + port)
@@ -83,20 +84,7 @@ func main() {
 	}
 }
 
-// IntelShort is a simplified version of IntelJSON, where the content is not included.
-type IntelShort struct {
-	CreatedAt   string
-	Title       string
-	Description string
-}
 
-// IntelFull is a more detailed version of IntelJSON, including the content.
-type IntelFull struct {
-	CreatedAt   string
-	Title       string
-	Description string
-	Content     [][]string
-}
 
 // This function handles the submission of new intel data.
 // It processes the form data, creates a new IntelJSON object,
@@ -133,14 +121,14 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(http.StatusOK)
 
-	intelShorts, err := getAllIntelShorts()
+	intelShorts, err := model.GetAllIntelShorts()
 	if err != nil {
 		http.Error(w, "Failed to read intel file", http.StatusInternalServerError)
 		log.Println("Error reading intel file:", err)
 		return
 	}
 
-	err = IntelList(intelShorts).Render(context.Background(), w)
+	err = pages.IntelList(intelShorts).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render intel page", http.StatusInternalServerError)
 		log.Println("Error rendering intel page:", err)
@@ -149,53 +137,6 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// getIntelShort reads a JSON file from the data/intel directory,
-// parses it into an IntelJSON struct, and returns an IntelShort struct
-// containing the title, description, and createdAt fields.
-//
-// It returns an error if the file cannot be read or parsed.
-func getIntelShort(id string) (IntelShort, error) {
-
-	intel, err := model.LoadIntel(id)
-	if err != nil {
-		return IntelShort{}, err
-	}
-	
-	var intelShort IntelShort
-
-	intelShort.CreatedAt = id
-	intelShort.Description = intel.Description
-	intelShort.Title = intel.Title
-
-	return intelShort, nil
-}
-
-// Reads all intel files from the data/intel directory,
-// parses them into IntelShort objects, and returns a slice of these objects.
-// If an error occurs during reading or parsing, it logs the error and continues with the next file.
-//
-// It returns a slice of IntelShort objects and an error if any.
-func getAllIntelShorts() ([]IntelShort, error) {
-	intelIDs, err := model.GetAllAnnotationIDs()
-	if err != nil {
-		log.Println("Error getting intel IDs:", err)
-		return nil, err
-	}
-
-	intels := make([]IntelShort, 0, len(intelIDs))
-	for _, id := range intelIDs {
-
-		intel, err := getIntelShort(id)
-		if err != nil {
-			log.Printf("Error reading file %s: %v", id, err)
-			continue
-		}
-		intels = append(intels, intel)
-
-	}
-
-	return intels, nil
-}
 
 // HandleIntelIndex handles the request for the Intel index page.
 // It reads all intel files, creates a list of IntelShort objects,
@@ -206,14 +147,14 @@ func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Handling Intel index page")
 
-	intelShorts, err := getAllIntelShorts()
+	intelShorts, err := model.GetAllIntelShorts()
 	if err != nil {
 		http.Error(w, "Failed to r ead intel files", http.StatusInternalServerError)
 		log.Println("Error reading intel files:", err)
 		return
 	}
 
-	err = IntelList(intelShorts).Render(context.Background(), w)
+	err = pages.IntelList(intelShorts).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render intel page", http.StatusInternalServerError)
 		log.Println("Error rendering intel page:", err)
@@ -221,23 +162,6 @@ func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// stampToDate converts a timestamp string to a formatted date string.
-// It expects the timestamp to be in seconds since the Unix epoch.
-// The returned date is formatted as "2006-01-02 15:04:05".
-//
-// Example: "1633072800" -> "2021-10-01 00:00:00"
-//
-// If the input is not a valid timestamp, it returns an error.
-func stampToDate(fileNameOnly string) (string, error) {
-	timestamp, err := strconv.ParseInt(fileNameOnly, 10, 64)
-	if err != nil {
-		return "", err
-	}
-
-	date := time.Unix(timestamp, 0)
-
-	return date.Format("2006-01-02 15:04:05"), nil
-}
 
 // handleAnnotate is a view that gets an intel data and then allows users to add annotations to it.
 func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
@@ -264,7 +188,7 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error getting annotated intel:", err)
 		return
 	}
-	err = Annotate(ann, annotatedIntel).Render(context.Background(), w)
+	err = pages.Annotate(ann, annotatedIntel).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
 		log.Println("Error rendering annotation page:", err)
@@ -330,7 +254,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = Annotate(ann, annotatedIntel).Render(context.Background(), w)
+	err = pages.Annotate(ann, annotatedIntel).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
 		log.Println("Error rendering annotation page:", err)
@@ -338,26 +262,20 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type AnnotatedIntel struct {
-	CreatedAt   string                  `json:"created_at"` // This is a timestamp in string format, e.g., "1633072800"
-	Title       string                  `json:"title"`
-	Description string                  `json:"description"`
-	Content     [][]model.AnnotatedWord `json:"content"` // This is a slice of slices of AnnotatedWord, where each AnnotatedWord contains the word and its annotations
-}
 
-func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
+func GetAnnotatedIntel(id string) (model.AnnotatedIntel, error) {
 
 	if id == "" {
 		log.Println("No Intel ID provided")
-		return AnnotatedIntel{}, nil
+		return model.AnnotatedIntel{}, nil
 	}
 
 	intel, err := model.LoadIntel(id)
 	if err != nil {
-		return AnnotatedIntel{}, err
+		return model.AnnotatedIntel{}, err
 	}
 
-	var intelFull IntelFull
+	var intelFull model.IntelFull
 
 	intelFull.CreatedAt = id
 	intelFull.Description = intel.Description
@@ -367,7 +285,7 @@ func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 	ann, err := model.LoadAllAnnotations(id)
 	if err != nil {
 		log.Println("Error getting annotations for Intel ID:", id, err)
-		return AnnotatedIntel{}, err
+		return model.AnnotatedIntel{}, err
 	}
 
 	annotatedContent := make([][]model.AnnotatedWord, len(intelFull.Content))
@@ -439,7 +357,7 @@ func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 		}
 	}
 
-	return AnnotatedIntel{
+	return model.AnnotatedIntel{
 		CreatedAt:   intelFull.CreatedAt,
 		Title:       intelFull.Title,
 		Description: intelFull.Description,

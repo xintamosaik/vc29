@@ -1,0 +1,11 @@
+package pages
+
+import (
+	"github.com/xintamosaik/vc29/components"
+)
+templ Intel() {
+	@components.Link("/intel/new", "Add new intel")
+	<br/>
+	<br/>
+	<div hx-trigger="load" hx-get="/intel/list"  hx-swap="outerHTML"></div>
+}

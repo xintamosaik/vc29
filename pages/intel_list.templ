@@ -1,0 +1,50 @@
+package pages
+import (
+	"strconv"
+	"time"
+	"github.com/xintamosaik/vc29/components"
+	"github.com/xintamosaik/vc29/model"
+)
+
+// stampToDate converts a timestamp string to a formatted date string.
+// It expects the timestamp to be in seconds since the Unix epoch.
+// The returned date is formatted as "2006-01-02 15:04:05".
+//
+// Example: "1633072800" -> "2021-10-01 00:00:00"
+//
+// If the input is not a valid timestamp, it returns an error.
+func stampToDate(fileNameOnly string) (string, error) {
+	timestamp, err := strconv.ParseInt(fileNameOnly, 10, 64)
+	if err != nil {
+		return "", err
+	}
+
+	date := time.Unix(timestamp, 0)
+
+	return date.Format("2006-01-02 15:04:05"), nil
+}
+
+templ IntelList(intel []model.IntelShort) {
+	for _, item := range intel {
+		<div id="intel_list">
+			<div class="item">
+				<div class="short">
+					<h2>
+						{ item.Title }
+					</h2>
+					<h3>
+						{ item.Description }
+					</h3>
+					<p>
+						{ stampToDate(item.CreatedAt) }
+					</p>
+				</div>
+				<div class="actions">
+					@components.Link("/intel/view/" + item.CreatedAt, "view")
+                    @components.Link("/intel/annotate/" + item.CreatedAt, "annotate")
+                    @components.Link("/intel/delete/" + item.CreatedAt, "delete")
+				</div>
+			</div>
+		</div>
+	}
+}

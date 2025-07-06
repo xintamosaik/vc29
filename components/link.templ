@@ -1,5 +1,5 @@
-package main
-templ link(href string, title string) {
+package components
+templ Link(href string, title string) {
 	<a href={ href } hx-get={ href } hx-swap="innerHTML" hx-target="#root">
 		{ title }
 	</a>

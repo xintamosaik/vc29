@@ -25,6 +25,21 @@ type Intel struct {
 	Content     [][]string `json:"content"`
 }
 
+// IntelShort is a simplified version of IntelJSON, where the content is not included.
+type IntelShort struct {
+	CreatedAt   string
+	Title       string
+	Description string
+}
+
+// IntelFull is a more detailed version of IntelJSON, including the content.
+type IntelFull struct {
+	CreatedAt   string
+	Title       string
+	Description string
+	Content     [][]string
+}
+
 func SaveIntel(title, description, content string) error {
 	intelData := Intel{
 		Title:       title,
@@ -81,3 +96,51 @@ func LoadIntel(id string) (Intel, error) {
 }
 
 
+// getIntelShort reads a JSON file from the data/intel directory,
+// parses it into an IntelJSON struct, and returns an IntelShort struct
+// containing the title, description, and createdAt fields.
+//
+// It returns an error if the file cannot be read or parsed.
+func GetIntelShort(id string) (IntelShort, error) {
+
+	intel, err := LoadIntel(id)
+	if err != nil {
+		return IntelShort{}, err
+	}
+	
+	var intelShort IntelShort
+
+	intelShort.CreatedAt = id
+	intelShort.Description = intel.Description
+	intelShort.Title = intel.Title
+
+	return intelShort, nil
+}
+
+
+// Reads all intel files from the data/intel directory,
+// parses them into IntelShort objects, and returns a slice of these objects.
+// If an error occurs during reading or parsing, it logs the error and continues with the next file.
+//
+// It returns a slice of IntelShort objects and an error if any.
+func GetAllIntelShorts() ([]IntelShort, error) {
+	intelIDs, err := GetAllAnnotationIDs()
+	if err != nil {
+		log.Println("Error getting intel IDs:", err)
+		return nil, err
+	}
+
+	intels := make([]IntelShort, 0, len(intelIDs))
+	for _, id := range intelIDs {
+
+		intel, err := GetIntelShort(id)
+		if err != nil {
+			log.Printf("Error reading file %s: %v", id, err)
+			continue
+		}
+		intels = append(intels, intel)
+
+	}
+
+	return intels, nil
+}
