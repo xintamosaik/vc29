@@ -68,7 +68,7 @@ func main() {
 
 	http.Handle("GET /intel", templ.Handler(pages.Intel()))
 	http.HandleFunc("GET /intel/list", HandleIntelIndex)
-	http.Handle("GET /intel/new", templ.Handler(New()))
+	http.Handle("GET /intel/new", templ.Handler(pages.New()))
 	http.HandleFunc("POST /intel/create", HandleNewIntel)
 	http.HandleFunc("GET /intel/annotate/{id}", HandleAnnotate)
 	http.HandleFunc("POST /intel/annotate/{id}", HandleNewAnnotation)
