@@ -32,14 +32,8 @@ func init() {
 	}
 }
 
-
-func GetAll(intelID string) ([]Annotation, error) {
+func LoadAllAnnotations(intelID string) ([]Annotation, error) {
 	annotationsDir := directoryAnnotations + "/" + intelID
-
-	if err := os.MkdirAll(annotationsDir, 0755); err != nil {
-		log.Printf("Error creating annotations directory %s: %v", annotationsDir, err)
-		return nil, err
-	}
 
 	files, err := os.ReadDir(annotationsDir)
 	if err != nil { // This is very improbable, but we handle it anyway
@@ -71,14 +65,13 @@ func GetAll(intelID string) ([]Annotation, error) {
 
 	return annotations, nil
 }
-func Save(intelID string, annotation Annotation) error {
+func SaveAnnotation(intelID string, annotation Annotation) error {
 	if intelID == "" {
 		log.Println("Intel ID is empty or invalid")
 		return os.ErrInvalid
 	}
 	intelID = strings.ReplaceAll(intelID, "..", "")
 	intelID = strings.TrimSpace(intelID)
-
 
 	annotationFileName := directoryAnnotations + "/" + intelID + "/" + annotation.UpdatedAt + ".json"
 	annotationFile, err := os.Create(annotationFileName)

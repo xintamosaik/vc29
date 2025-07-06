@@ -19,7 +19,7 @@ import (
 
 const port = ":3000"
 
-const directoryIntel =  "data/intel"
+const directoryIntel = "data/intel"
 
 func init() {
 	if err := os.MkdirAll("data", 0755); err != nil {
@@ -151,7 +151,6 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
 // getIntelShort reads a JSON file from the data/intel directory,
 // parses it into an IntelJSON struct, and returns an IntelShort struct
 // containing the title, description, and createdAt fields.
@@ -263,7 +262,7 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ann, err := model.GetAll(intelID)
+	ann, err := model.LoadAllAnnotations(intelID)
 	if err != nil {
 		http.Error(w, "Failed to read annotations", http.StatusInternalServerError)
 		log.Println("Error reading annotations:", err)
@@ -318,7 +317,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt:      timestamp,
 	}
 
-	err := model.Save(intelID, annotation)
+	err := model.SaveAnnotation(intelID, annotation)
 	if err != nil {
 		http.Error(w, "Failed to create annotation", http.StatusInternalServerError)
 		log.Println("Error creating annotation:", err)
@@ -329,7 +328,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 
 	ann := make([]model.Annotation, 0)
 
-	ann, err = model.GetAll(intelID)
+	ann, err = model.LoadAllAnnotations(intelID)
 	if err != nil {
 		http.Error(w, "Failed to read annotations", http.StatusInternalServerError)
 		log.Println("Error reading annotations:", err)
@@ -351,15 +350,12 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 type AnnotatedIntel struct {
-	CreatedAt   string            `json:"created_at"` // This is a timestamp in string format, e.g., "1633072800"
-	Title       string            `json:"title"`
-	Description string            `json:"description"`
+	CreatedAt   string                  `json:"created_at"` // This is a timestamp in string format, e.g., "1633072800"
+	Title       string                  `json:"title"`
+	Description string                  `json:"description"`
 	Content     [][]model.AnnotatedWord `json:"content"` // This is a slice of slices of AnnotatedWord, where each AnnotatedWord contains the word and its annotations
 }
-
-
 
 func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 
@@ -383,8 +379,7 @@ func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 	intelFull.Title = intel.Title
 	intelFull.Content = intel.Content
 
-
-	ann, err := model.GetAll(id)
+	ann, err := model.LoadAllAnnotations(id)
 	if err != nil {
 		log.Println("Error getting annotations for Intel ID:", id, err)
 		return AnnotatedIntel{}, err
