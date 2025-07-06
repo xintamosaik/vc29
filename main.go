@@ -481,10 +481,7 @@ func GetAll(intelID string) ([]Annotation, error) {
 }
 
 func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
-	// This function is a placeholder for future implementation.
-	// It could be used to retrieve annotated intel data based on the provided ID.
-	// Currently, it does not perform any operations.
-	log.Println("getAnnotatedIntel called with ID:", id)
+
 	if id == "" {
 		log.Println("No Intel ID provided")
 		return AnnotatedIntel{}, nil
@@ -495,16 +492,12 @@ func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 		log.Println("Error getting Intel full data:", err)
 		return AnnotatedIntel{}, err
 	}
-	log.Println("Intel data retrieved successfully:", full.Title)
 
 	ann, err := GetAll(id)
 	if err != nil {
 		log.Println("Error getting annotations for Intel ID:", id, err)
 		return AnnotatedIntel{}, err
 	}
-
-	log.Println("Annotations retrieved successfully for Intel ID:", id)
-	log.Println("Number of annotations:", len(ann)) // result of len: 4 - good!
 
 	annotatedContent := make([][]AnnotatedWord, len(full.Content))
 	for i, paragraph := range full.Content {
@@ -516,27 +509,21 @@ func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 			}
 			// Check if there are annotations for this sequence of words
 			for _, annotation := range ann {
-				log.Printf("Checking annotation: %+v for paragraph %d, word %d", annotation, i, j)
-
 				// Convert string indices to integers for proper comparison
 				startParagraph, err := strconv.Atoi(annotation.StartParagraph)
 				if err != nil {
-					log.Printf("Error converting start paragraph to int: %v", err)
 					continue
 				}
 				endParagraph, err := strconv.Atoi(annotation.EndParagraph)
 				if err != nil {
-					log.Printf("Error converting end paragraph to int: %v", err)
 					continue
 				}
 				startWord, err := strconv.Atoi(annotation.StartWord)
 				if err != nil {
-					log.Printf("Error converting start word to int: %v", err)
 					continue
 				}
 				endWord, err := strconv.Atoi(annotation.EndWord)
 				if err != nil {
-					log.Printf("Error converting end word to int: %v", err)
 					continue
 				}
 
@@ -544,13 +531,9 @@ func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 				isWithinAnnotation := false
 
 				if i < startParagraph {
-					// Current paragraph is before start paragraph
-					log.Printf("Skipping annotation for paragraph %d, word %d: before start paragraph", i, j)
 					continue
 				}
 				if i > endParagraph {
-					// Current paragraph is after end paragraph
-					log.Printf("Skipping annotation for paragraph %d, word %d: after end paragraph", i, j)
 					continue
 				}
 
@@ -573,20 +556,17 @@ func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 					// Current paragraph is between start and end paragraphs
 					isWithinAnnotation = true
 				}
-
-				if isWithinAnnotation {
-					log.Printf("Found annotation for paragraph %d, word %d: %s", i, j, annotation.Keyword)
-					// If the annotation is within the range, add the ID
-					annotatedContent[i][j].AnnotationIDs = append(annotatedContent[i][j].AnnotationIDs, annotation.UpdatedAt)
-					annotatedContent[i][j].Keywords = append(annotatedContent[i][j].Keywords, annotation.Keyword)
-					log.Printf("Annotated word: %+v", annotatedContent[i][j])
-				} else {
-					log.Printf("Skipping annotation for paragraph %d, word %d: not within range", i, j)
+				if !isWithinAnnotation {
+					continue
 				}
+
+				// If the annotation is within the range, add the ID and keyword
+				annotatedContent[i][j].AnnotationIDs = append(annotatedContent[i][j].AnnotationIDs, annotation.UpdatedAt)
+				annotatedContent[i][j].Keywords = append(annotatedContent[i][j].Keywords, annotation.Keyword)
+
 			}
 		}
 	}
-	log.Println("Annotated content created successfully")
 
 	return AnnotatedIntel{
 		CreatedAt:   full.CreatedAt,
