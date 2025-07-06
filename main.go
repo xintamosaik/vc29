@@ -13,6 +13,8 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/evanw/esbuild/pkg/api"
+
+	"github.com/xintamosaik/vc29/model"
 )
 
 const port = ":3000"
@@ -74,9 +76,9 @@ func main() {
 
 	http.Handle("GET /home", templ.Handler(Home()))
 	http.Handle("GET /intel", templ.Handler(Intel()))
-	
+
 	http.HandleFunc("GET /intel/list", HandleIntelIndex)
-	
+
 	http.Handle("GET /intel/new", templ.Handler(New()))
 
 	http.HandleFunc("POST /intel/create", HandleNewIntel)
@@ -85,21 +87,11 @@ func main() {
 	http.Handle("GET /drafts", templ.Handler(Drafts()))
 	http.Handle("GET /signals", templ.Handler(Signals()))
 
-
 	// Start the HTTP server
 	fmt.Println("Starting server on http://localhost" + port)
 	if err := http.ListenAndServe(port, nil); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
-}
-
-
-
-// IntelJSON represents the structure of the intel data stored in JSON files.
-type IntelJSON struct {
-	Title       string     `json:"title"`
-	Description string     `json:"description"`
-	Content     [][]string `json:"content"`
 }
 
 // IntelShort is a simplified version of IntelJSON, where the content is not included.
@@ -141,41 +133,12 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 	description := r.FormValue("description")
 	content := r.FormValue("content")
 
-	intelData := IntelJSON{
-		Title:       title,
-		Description: description,
-		Content:     make([][]string, 0),
-	}
-
-	lines := strings.SplitSeq(content, "\n")
-	for line := range lines {
-		words := strings.Fields(strings.TrimSpace(line))
-		intelData.Content = append(intelData.Content, words)
-	}
-
-	// Add the data/intel directory
-	if err := os.MkdirAll(directoryIntel, 0755); err != nil {
-		log.Fatalf("Failed to create data/intel directory: %v", err)
-	}
-
-	// save as JSON file with timestamp converted to string
-	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	fileName := directoryIntel + "/" + timestamp + ".json"
-	file, err := os.Create(fileName)
+	err := model.SaveIntel(title, description, content)
 	if err != nil {
-		http.Error(w, "Failed to create file", http.StatusInternalServerError)
-		log.Println("Error creating file:", err)
+		http.Error(w, "Failed to save intel data", http.StatusInternalServerError)
+		log.Println("Error saving intel data:", err)
 		return
 	}
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	if err := encoder.Encode(intelData); err != nil {
-		http.Error(w, "Failed to encode JSON", http.StatusInternalServerError)
-		log.Println("Error encoding JSON:", err)
-		return
-	}
-	log.Println("Intel data saved to", fileName)
 
 	// Respond
 	w.Header().Set("Content-Type", "text/html")
@@ -202,22 +165,18 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 // containing the createdAt, title, description, and content fields.
 //
 // It returns an error if the file cannot be read or parsed.
+//
+// @TODO: At the time of writing this could be inlined because it is only used once
 func getIntelFull(fileName string) (IntelFull, error) {
-	file, err := os.Open(fileName)
+	intel, err := model.LoadIntel(fileName)
 	if err != nil {
-		return IntelFull{}, err
-	}
-	defer file.Close()
-
-	var intel IntelJSON
-	var intelFull IntelFull
-	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&intel); err != nil {
 		return IntelFull{}, err
 	}
 
 	trimmedFileName := strings.TrimSuffix(fileName, ".json")
 	fileNameOnly := strings.TrimPrefix(trimmedFileName, directoryIntel+"/") // Whhich is a unix time stamp
+
+	var intelFull IntelFull
 
 	intelFull.CreatedAt = fileNameOnly
 	intelFull.Description = intel.Description
@@ -240,7 +199,7 @@ func getIntelShort(fileName string) (IntelShort, error) {
 	}
 	defer file.Close()
 
-	var intel IntelJSON
+	var intel model.Intel
 	var intelShort IntelShort
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(&intel); err != nil {
@@ -449,8 +408,6 @@ type AnnotatedIntel struct {
 	Description string            `json:"description"`
 	Content     [][]AnnotatedWord `json:"content"` // This is a slice of slices of AnnotatedWord, where each AnnotatedWord contains the word and its annotations
 }
-
-
 
 func Save(intelID string, annotation Annotation) error {
 	if intelID == "" {
