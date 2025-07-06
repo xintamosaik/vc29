@@ -65,16 +65,16 @@ func main() {
 	})
 
 	http.Handle("GET /home", templ.Handler(pages.Home()))
+
 	http.Handle("GET /intel", templ.Handler(pages.Intel()))
-
 	http.HandleFunc("GET /intel/list", HandleIntelIndex)
-
 	http.Handle("GET /intel/new", templ.Handler(New()))
-
 	http.HandleFunc("POST /intel/create", HandleNewIntel)
 	http.HandleFunc("GET /intel/annotate/{id}", HandleAnnotate)
 	http.HandleFunc("POST /intel/annotate/{id}", HandleNewAnnotation)
+
 	http.Handle("GET /drafts", templ.Handler(pages.Drafts()))
+	
 	http.Handle("GET /signals", templ.Handler(pages.Signals()))
 
 	// Start the HTTP server
@@ -182,7 +182,7 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Annotations loaded successfully for Intel ID:", intelID)
 	log.Println("Number of annotations:", len(ann))
-	annotatedIntel, err := GetAnnotatedIntel(intelID)
+	annotatedIntel, err := model.GetAnnotatedIntel(intelID)
 	if err != nil {
 		http.Error(w, "Failed to get annotated intel", http.StatusInternalServerError)
 		log.Println("Error getting annotated intel:", err)
@@ -247,7 +247,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	annotatedIntel, err := GetAnnotatedIntel(intelID)
+	annotatedIntel, err := model.GetAnnotatedIntel(intelID)
 	if err != nil {
 		http.Error(w, "Failed to get annotated intel", http.StatusInternalServerError)
 		log.Println("Error getting annotated intel:", err)
@@ -262,106 +262,3 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-func GetAnnotatedIntel(id string) (model.AnnotatedIntel, error) {
-
-	if id == "" {
-		log.Println("No Intel ID provided")
-		return model.AnnotatedIntel{}, nil
-	}
-
-	intel, err := model.LoadIntel(id)
-	if err != nil {
-		return model.AnnotatedIntel{}, err
-	}
-
-	var intelFull model.IntelFull
-
-	intelFull.CreatedAt = id
-	intelFull.Description = intel.Description
-	intelFull.Title = intel.Title
-	intelFull.Content = intel.Content
-
-	ann, err := model.LoadAllAnnotations(id)
-	if err != nil {
-		log.Println("Error getting annotations for Intel ID:", id, err)
-		return model.AnnotatedIntel{}, err
-	}
-
-	annotatedContent := make([][]model.AnnotatedWord, len(intelFull.Content))
-	for i, paragraph := range intelFull.Content {
-		annotatedContent[i] = make([]model.AnnotatedWord, len(paragraph))
-		for j, word := range paragraph {
-			annotatedContent[i][j] = model.AnnotatedWord{
-				Word:          word,
-				AnnotationIDs: []string{}, // Initialize with an empty slice
-			}
-			// Check if there are annotations for this sequence of words
-			for _, annotation := range ann {
-				// Convert string indices to integers for proper comparison
-				startParagraph, err := strconv.Atoi(annotation.StartParagraph)
-				if err != nil {
-					continue
-				}
-				endParagraph, err := strconv.Atoi(annotation.EndParagraph)
-				if err != nil {
-					continue
-				}
-				startWord, err := strconv.Atoi(annotation.StartWord)
-				if err != nil {
-					continue
-				}
-				endWord, err := strconv.Atoi(annotation.EndWord)
-				if err != nil {
-					continue
-				}
-
-				// Check if current position is within annotation range
-				isWithinAnnotation := false
-
-				if i < startParagraph {
-					continue
-				}
-				if i > endParagraph {
-					continue
-				}
-
-				if i == startParagraph && i == endParagraph {
-					// Annotation is within the same paragraph
-					if j >= startWord && j <= endWord {
-						isWithinAnnotation = true
-					}
-				} else if i == startParagraph {
-					// Current paragraph is the start paragraph
-					if j >= startWord {
-						isWithinAnnotation = true
-					}
-				} else if i == endParagraph {
-					// Current paragraph is the end paragraph
-					if j <= endWord {
-						isWithinAnnotation = true
-					}
-				} else {
-					// Current paragraph is between start and end paragraphs
-					isWithinAnnotation = true
-				}
-				if !isWithinAnnotation {
-					continue
-				}
-
-				// If the annotation is within the range, add the ID and keyword
-				annotatedContent[i][j].AnnotationIDs = append(annotatedContent[i][j].AnnotationIDs, annotation.UpdatedAt)
-				annotatedContent[i][j].Keywords = append(annotatedContent[i][j].Keywords, annotation.Keyword)
-
-			}
-		}
-	}
-
-	return model.AnnotatedIntel{
-		CreatedAt:   intelFull.CreatedAt,
-		Title:       intelFull.Title,
-		Description: intelFull.Description,
-		Content:     annotatedContent,
-	}, nil
-
-}
