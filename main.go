@@ -18,20 +18,15 @@ import (
 )
 
 const port = ":3000"
-const directoryData = "data"
-const directoryIntel = directoryData + "/intel"
 
+const directoryIntel =  "data/intel"
 
-func main() {
-
-	// Housekeeping: Create a data directory if it doesn't exist
+func init() {
 	if err := os.MkdirAll("data", 0755); err != nil {
 		log.Fatalf("Failed to create data directory: %v", err)
 	}
-
-	if err := os.MkdirAll(directoryIntel, 0755); err != nil {
-		log.Fatalf("Failed to create data/intel directory: %v", err)
-	}
+}
+func main() {
 
 	// Bundle the JavaScript and CSS files using esbuild
 	result := api.Build(api.BuildOptions{
@@ -156,31 +151,6 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// getIntelFull reads a JSON file from the data/intel directory,
-// parses it into an IntelJSON struct, and returns an IntelFull struct
-// containing the createdAt, title, description, and content fields.
-//
-// It returns an error if the file cannot be read or parsed.
-//
-// @TODO: At the time of writing this could be inlined because it is only used once
-func getIntelFull(fileName string) (IntelFull, error) {
-	intel, err := model.LoadIntel(fileName)
-	if err != nil {
-		return IntelFull{}, err
-	}
-
-	trimmedFileName := strings.TrimSuffix(fileName, ".json")
-	fileNameOnly := strings.TrimPrefix(trimmedFileName, directoryIntel+"/") // Whhich is a unix time stamp
-
-	var intelFull IntelFull
-
-	intelFull.CreatedAt = fileNameOnly
-	intelFull.Description = intel.Description
-	intelFull.Title = intel.Title
-	intelFull.Content = intel.Content
-
-	return intelFull, nil
-}
 
 // getIntelShort reads a JSON file from the data/intel directory,
 // parses it into an IntelJSON struct, and returns an IntelShort struct
@@ -398,11 +368,21 @@ func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 		return AnnotatedIntel{}, nil
 	}
 
-	full, err := getIntelFull(directoryIntel + "/" + id + ".json")
+	intel, err := model.LoadIntel(id)
 	if err != nil {
-		log.Println("Error getting Intel full data:", err)
 		return AnnotatedIntel{}, err
 	}
+
+	trimmedFileName := strings.TrimSuffix(id, ".json")
+	fileNameOnly := strings.TrimPrefix(trimmedFileName, directoryIntel+"/") // Whhich is a unix time stamp
+
+	var intelFull IntelFull
+
+	intelFull.CreatedAt = fileNameOnly
+	intelFull.Description = intel.Description
+	intelFull.Title = intel.Title
+	intelFull.Content = intel.Content
+
 
 	ann, err := model.GetAll(id)
 	if err != nil {
@@ -410,8 +390,8 @@ func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 		return AnnotatedIntel{}, err
 	}
 
-	annotatedContent := make([][]model.AnnotatedWord, len(full.Content))
-	for i, paragraph := range full.Content {
+	annotatedContent := make([][]model.AnnotatedWord, len(intelFull.Content))
+	for i, paragraph := range intelFull.Content {
 		annotatedContent[i] = make([]model.AnnotatedWord, len(paragraph))
 		for j, word := range paragraph {
 			annotatedContent[i][j] = model.AnnotatedWord{
@@ -480,9 +460,9 @@ func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 	}
 
 	return AnnotatedIntel{
-		CreatedAt:   full.CreatedAt,
-		Title:       full.Title,
-		Description: full.Description,
+		CreatedAt:   intelFull.CreatedAt,
+		Title:       intelFull.Title,
+		Description: intelFull.Description,
 		Content:     annotatedContent,
 	}, nil
 

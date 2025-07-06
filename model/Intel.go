@@ -59,7 +59,11 @@ func SaveIntel(title, description, content string) error {
 	return nil
 }
 
-func LoadIntel(fileName string) (Intel, error) {
+func LoadIntel(id string) (Intel, error) {
+	fileName := directoryIntel + "/" + id + ".json"
+	if _, err := os.Stat(fileName); os.IsNotExist(err) {
+		return Intel{}, err
+	}
 	file, err := os.Open(fileName)
 	if err != nil {
 		return Intel{}, err
@@ -75,3 +79,5 @@ func LoadIntel(fileName string) (Intel, error) {
 
 	return intel, nil
 }
+
+
