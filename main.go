@@ -20,7 +20,7 @@ import (
 const port = ":3000"
 const directoryData = "data"
 const directoryIntel = directoryData + "/intel"
-const directoryAnnotations = directoryData + "/annotations"
+
 
 func main() {
 
@@ -31,10 +31,6 @@ func main() {
 
 	if err := os.MkdirAll(directoryIntel, 0755); err != nil {
 		log.Fatalf("Failed to create data/intel directory: %v", err)
-	}
-
-	if err := os.MkdirAll(directoryAnnotations, 0755); err != nil {
-		log.Fatalf("Failed to create data/annotations directory: %v", err)
 	}
 
 	// Bundle the JavaScript and CSS files using esbuild
@@ -297,7 +293,7 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ann, err := GetAll(intelID)
+	ann, err := model.GetAll(intelID)
 	if err != nil {
 		http.Error(w, "Failed to read annotations", http.StatusInternalServerError)
 		log.Println("Error reading annotations:", err)
@@ -342,7 +338,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 	keyword := r.FormValue("keyword")
 	description := r.FormValue("description")
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	annotation := Annotation{
+	annotation := model.Annotation{
 		StartParagraph: startParagraph,
 		StartWord:      startWord,
 		EndParagraph:   endParagraph,
@@ -352,7 +348,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt:      timestamp,
 	}
 
-	err := Save(intelID, annotation)
+	err := model.Save(intelID, annotation)
 	if err != nil {
 		http.Error(w, "Failed to create annotation", http.StatusInternalServerError)
 		log.Println("Error creating annotation:", err)
@@ -361,9 +357,9 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 
-	ann := make([]Annotation, 0)
+	ann := make([]model.Annotation, 0)
 
-	ann, err = GetAll(intelID)
+	ann, err = model.GetAll(intelID)
 	if err != nil {
 		http.Error(w, "Failed to read annotations", http.StatusInternalServerError)
 		log.Println("Error reading annotations:", err)
@@ -385,100 +381,15 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Annotation represents an annotation on an intel data.
-type Annotation struct {
-	StartParagraph string `json:"start_paragraph"`
-	StartWord      string `json:"start_word"`
-	EndParagraph   string `json:"end_paragraph"`
-	EndWord        string `json:"end_word"`
-	Keyword        string `json:"keyword"`
-	Description    string `json:"description"`
-	UpdatedAt      string `json:"updated_at"` // We do not need created_at, because we use the file name as a timestamp
-}
-
-type AnnotatedWord struct {
-	Word          string   `json:"word"`
-	AnnotationIDs []string `json:"annotation_id"`     // These are the IDs of the annotations that apply to this word
-	Keywords      []string `json:"keyword,omitempty"` // Optional keyword for the word, if applicable
-}
 
 type AnnotatedIntel struct {
 	CreatedAt   string            `json:"created_at"` // This is a timestamp in string format, e.g., "1633072800"
 	Title       string            `json:"title"`
 	Description string            `json:"description"`
-	Content     [][]AnnotatedWord `json:"content"` // This is a slice of slices of AnnotatedWord, where each AnnotatedWord contains the word and its annotations
+	Content     [][]model.AnnotatedWord `json:"content"` // This is a slice of slices of AnnotatedWord, where each AnnotatedWord contains the word and its annotations
 }
 
-func Save(intelID string, annotation Annotation) error {
-	if intelID == "" {
-		log.Println("Intel ID is empty or invalid")
-		return os.ErrInvalid
-	}
-	intelID = strings.ReplaceAll(intelID, "..", "")
-	intelID = strings.TrimSpace(intelID)
 
-	if err := os.MkdirAll(directoryAnnotations+"/"+intelID, 0755); err != nil {
-		log.Println("Error creating annotations directory:", err)
-		return err
-	}
-
-	annotationFileName := directoryAnnotations + "/" + intelID + "/" + annotation.UpdatedAt + ".json"
-	annotationFile, err := os.Create(annotationFileName)
-	if err != nil {
-
-		log.Println("Error creating annotation file:", err)
-		return err
-	}
-	defer annotationFile.Close()
-
-	encoder := json.NewEncoder(annotationFile)
-	if err := encoder.Encode(annotation); err != nil {
-
-		log.Println("Error encoding annotation JSON:", err)
-		return err
-	}
-
-	return nil
-}
-
-func GetAll(intelID string) ([]Annotation, error) {
-	annotationsDir := directoryAnnotations + "/" + intelID
-
-	if err := os.MkdirAll(annotationsDir, 0755); err != nil {
-		log.Printf("Error creating annotations directory %s: %v", annotationsDir, err)
-		return nil, err
-	}
-
-	files, err := os.ReadDir(annotationsDir)
-	if err != nil { // This is very improbable, but we handle it anyway
-		log.Printf("Error reading annotations directory %s: %v", annotationsDir, err)
-		return nil, err
-	}
-
-	annotations := make([]Annotation, 0, len(files))
-	for _, file := range files {
-		if file.IsDir() {
-			continue
-		}
-
-		filePath := annotationsDir + "/" + file.Name()
-		fileContent, err := os.ReadFile(filePath)
-		if err != nil {
-			log.Printf("Error reading annotation file %s: %v", file.Name(), err)
-			continue
-		}
-
-		var annotation Annotation
-		if err := json.Unmarshal(fileContent, &annotation); err != nil {
-			log.Printf("Error unmarshalling annotation file %s: %v", file.Name(), err)
-			continue
-		}
-
-		annotations = append(annotations, annotation)
-	}
-
-	return annotations, nil
-}
 
 func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 
@@ -493,17 +404,17 @@ func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 		return AnnotatedIntel{}, err
 	}
 
-	ann, err := GetAll(id)
+	ann, err := model.GetAll(id)
 	if err != nil {
 		log.Println("Error getting annotations for Intel ID:", id, err)
 		return AnnotatedIntel{}, err
 	}
 
-	annotatedContent := make([][]AnnotatedWord, len(full.Content))
+	annotatedContent := make([][]model.AnnotatedWord, len(full.Content))
 	for i, paragraph := range full.Content {
-		annotatedContent[i] = make([]AnnotatedWord, len(paragraph))
+		annotatedContent[i] = make([]model.AnnotatedWord, len(paragraph))
 		for j, word := range paragraph {
-			annotatedContent[i][j] = AnnotatedWord{
+			annotatedContent[i][j] = model.AnnotatedWord{
 				Word:          word,
 				AnnotationIDs: []string{}, // Initialize with an empty slice
 			}
