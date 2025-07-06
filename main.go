@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
+
 	"time"
 
 	"github.com/a-h/templ"
@@ -18,8 +18,6 @@ import (
 )
 
 const port = ":3000"
-
-const directoryIntel = "data/intel"
 
 func init() {
 	if err := os.MkdirAll("data", 0755); err != nil {
@@ -156,54 +154,44 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 // containing the title, description, and createdAt fields.
 //
 // It returns an error if the file cannot be read or parsed.
-func getIntelShort(fileName string) (IntelShort, error) {
+func getIntelShort(id string) (IntelShort, error) {
 
-	file, err := os.Open(fileName)
+	intel, err := model.LoadIntel(id)
 	if err != nil {
 		return IntelShort{}, err
 	}
-	defer file.Close()
-
-	var intel model.Intel
+	
 	var intelShort IntelShort
-	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&intel); err != nil {
 
-		return IntelShort{}, err
-	}
-
-	trimmedFileName := strings.TrimSuffix(fileName, ".json")
-	fileNameOnly := strings.TrimPrefix(trimmedFileName, directoryIntel+"/") // Whhich is a unix time stamp
-
-	intelShort.CreatedAt = fileNameOnly
+	intelShort.CreatedAt = id
 	intelShort.Description = intel.Description
 	intelShort.Title = intel.Title
 
 	return intelShort, nil
 }
 
-// getAllIntelShorts reads all intel files from the data/intel directory,
+// Reads all intel files from the data/intel directory,
 // parses them into IntelShort objects, and returns a slice of these objects.
 // If an error occurs during reading or parsing, it logs the error and continues with the next file.
 //
 // It returns a slice of IntelShort objects and an error if any.
 func getAllIntelShorts() ([]IntelShort, error) {
-	files, err := os.ReadDir(directoryIntel)
+	intelIDs, err := model.GetAllAnnotationIDs()
 	if err != nil {
+		log.Println("Error getting intel IDs:", err)
 		return nil, err
 	}
 
-	intels := make([]IntelShort, 0, len(files))
+	intels := make([]IntelShort, 0, len(intelIDs))
+	for _, id := range intelIDs {
 
-	for _, file := range files {
-		if !file.IsDir() {
-			intel, err := getIntelShort(directoryIntel + "/" + file.Name())
-			if err != nil {
-				log.Printf("Error reading file %s: %v", file.Name(), err)
-				continue
-			}
-			intels = append(intels, intel)
+		intel, err := getIntelShort(id)
+		if err != nil {
+			log.Printf("Error reading file %s: %v", id, err)
+			continue
 		}
+		intels = append(intels, intel)
+
 	}
 
 	return intels, nil
@@ -369,12 +357,9 @@ func GetAnnotatedIntel(id string) (AnnotatedIntel, error) {
 		return AnnotatedIntel{}, err
 	}
 
-	trimmedFileName := strings.TrimSuffix(id, ".json")
-	fileNameOnly := strings.TrimPrefix(trimmedFileName, directoryIntel+"/") // Whhich is a unix time stamp
-
 	var intelFull IntelFull
 
-	intelFull.CreatedAt = fileNameOnly
+	intelFull.CreatedAt = id
 	intelFull.Description = intel.Description
 	intelFull.Title = intel.Title
 	intelFull.Content = intel.Content

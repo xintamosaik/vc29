@@ -32,6 +32,29 @@ func init() {
 	}
 }
 
+func GetAllAnnotationIDs() ([]string, error) {
+	
+	files, err := os.ReadDir(directoryIntel)
+	if err != nil {
+		return nil, err
+	}
+	ids := make([]string, 0, len(files))
+
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+
+		fileName := file.Name()
+		if strings.HasSuffix(fileName, ".json") {
+			id := strings.TrimSuffix(fileName, ".json")
+			ids = append(ids, id)
+		}
+		
+	}
+	return ids, nil
+}
+
 func LoadAllAnnotations(intelID string) ([]Annotation, error) {
 	annotationsDir := directoryAnnotations + "/" + intelID
 
