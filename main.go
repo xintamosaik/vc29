@@ -59,12 +59,8 @@ func main() {
 	http.Handle("/dist/", http.StripPrefix("/dist/", dist))
 	
 	http.Handle("GET /under_the_fold", templ.Handler(under_the_fold()))
-	http.Handle("GET /home", templ.Handler(pages.Home()))
-	http.Handle("GET /intel", templ.Handler(pages.Intel()))
+	
 	http.Handle("GET /intel/new", templ.Handler(pages.New()))
-	http.Handle("GET /drafts", templ.Handler(pages.Drafts()))
-	http.Handle("GET /signals", templ.Handler(pages.Signals()))
-
 	http.HandleFunc("GET /intel/list", HandleIntelIndex)
 	http.HandleFunc("POST /intel/create", HandleNewIntel)
 	http.HandleFunc("GET /intel/annotate/{id}", HandleAnnotate)
