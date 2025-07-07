@@ -1,10 +1,10 @@
 (function initNavigation() {
     const navigation = window.main_navigation;
-    const links = navigation.querySelectorAll('a');
+    const links = navigation.querySelectorAll('input');
 
     function navigate(event) {
         const clicked = event.target
-        if (clicked.tagName !== 'A') {
+        if (clicked.tagName !== 'INPUT') {
             return;
         }
 
