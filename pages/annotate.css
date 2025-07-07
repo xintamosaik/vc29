@@ -3,33 +3,5 @@
         cursor: pointer;
         font-style: italic;
     }
-    [data-marked="1"] {
-        background-color: #ff04;
-    }
-    [data-marked="2"] {
-        background-color: #ff05;
-    }
-    [data-marked="3"] {
-        background-color: #fc06;
-    }
-    [data-marked="4"] {
-        background-color: #fc07;
-        font-weight: bold;
-    }
-    [data-marked="5"] {
-        background-color: #fa08;
-        font-weight: bold;
-    }
-    [data-marked="6"] {
-        background-color: #fa09;
-        font-weight: bold;
-    }
-    [data-marked="7"] {
-        background-color: #f70a;
-        font-weight: bold;
-    }
-    [data-marked="8"] {
-        background-color: #f70b;
-        font-weight: bold;
-    }
+  
 }
