@@ -8,13 +8,7 @@
     <title>VC29</title>
     <meta name="description" content="A web application with dynamic navigation and content loading.">
 
-
-    <link href="above_the_fold.css" rel="stylesheet">
-    <style>
-
-    </style>
-
-
+    <link href="above_the_fold.css" rel="stylesheet" media="screen">
 </head>
 
 <body>
@@ -27,12 +21,14 @@
 
     <main>
         <section class="main" id="home">
-            <h1>Home</h1>
+            <h2>Home</h2>
             <p>
                 Welcome to our web application! This is the home page where you can find the latest updates and
                 features.
             </p>
         </section>
+
+        <!-- this marks the "fold" -->
 
         <div hx-trigger="load" hx-get="/under_the_fold" hx-swap="outerHTML"></div>
     </main>
@@ -40,7 +36,7 @@
     <script>
 
     </script>
-    <script src="above_the_fold.js" async></script>
+    <script src="above_the_fold.js" type="text/javascript" async></script>
 
     <script>
         const link = document.createElement('link');
@@ -49,8 +45,8 @@
         document.head.appendChild(link);
     </script>
 
-    <script src="dist/under_the_fold.js" defer> </script>
-    <script src="htmx.min.js" defer></script>
+    <script src="dist/under_the_fold.js" type="text/javascript" defer> </script>
+    <script src="htmx.min.js" type="text/javascript" defer></script>
 </body>
 
 </html>
