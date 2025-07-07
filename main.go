@@ -24,8 +24,6 @@ func init() {
 	if err := os.MkdirAll("data", 0755); err != nil {
 		log.Fatalf("Failed to create data directory: %v", err)
 	}
-}
-func main() {
 
 	// Bundle the JavaScript and CSS files using esbuild
 	result := api.Build(api.BuildOptions{
@@ -48,6 +46,9 @@ func main() {
 	if len(result.Errors) > 0 {
 		os.Exit(1)
 	}
+}
+
+func main() {
 
 	// Static files: html
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -65,17 +66,15 @@ func main() {
 	})
 
 	http.Handle("GET /home", templ.Handler(pages.Home()))
-
 	http.Handle("GET /intel", templ.Handler(pages.Intel()))
-	http.HandleFunc("GET /intel/list", HandleIntelIndex)
 	http.Handle("GET /intel/new", templ.Handler(pages.New()))
+	http.Handle("GET /drafts", templ.Handler(pages.Drafts()))
+	http.Handle("GET /signals", templ.Handler(pages.Signals()))
+
+	http.HandleFunc("GET /intel/list", HandleIntelIndex)
 	http.HandleFunc("POST /intel/create", HandleNewIntel)
 	http.HandleFunc("GET /intel/annotate/{id}", HandleAnnotate)
 	http.HandleFunc("POST /intel/annotate/{id}", HandleNewAnnotation)
-
-	http.Handle("GET /drafts", templ.Handler(pages.Drafts()))
-
-	http.Handle("GET /signals", templ.Handler(pages.Signals()))
 
 	// Start the HTTP server
 	fmt.Println("Starting server on http://localhost" + port)
@@ -83,8 +82,6 @@ func main() {
 		log.Fatalf("Server failed to start: %v", err)
 	}
 }
-
-
 
 // This function handles the submission of new intel data.
 // It processes the form data, creates a new IntelJSON object,
@@ -137,7 +134,6 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
 // HandleIntelIndex handles the request for the Intel index page.
 // It reads all intel files, creates a list of IntelShort objects,
 // and renders the index template with the list.
@@ -161,7 +157,6 @@ func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-
 
 // handleAnnotate is a view that gets an intel data and then allows users to add annotations to it.
 func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
@@ -254,4 +249,3 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-
