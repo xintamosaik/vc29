@@ -15,18 +15,18 @@ var colorMatches = []colorMatch{
 	{"1", "dark:bg-sky-950 bg-sky-50"},
 	{"2", "dark:bg-cyan-950 bg-cyan-50"},
 	{"3", "dark:bg-teal-950 bg-teal-50"},
-	{"4", "dark:bg-emerald-950 bg-emerald-50"},
-	{"5", "dark:bg-green-950 bg-green-50"},
-	{"6", "dark:bg-lime-950 bg-lime-50"},
-	{"7", "dark:bg-yellow-950 bg-yellow-50"},
-	{"8", "dark:bg-amber-950 bg-amber-50"},
-	{"9", "dark:bg-orange-950 bg-orange-50"},
-	{"10", "dark:bg-red-950 bg-red-50"},
-	{"11", "dark:bg-rose-950 bg-rose-50"},
-	{"12", "dark:bg-pink-950 bg-pink-50"},
-	{"13", "dark:bg-fuchsia-950 bg-fuchsia-50"},
-	{"14", "dark:bg-purple-950 bg-purple-50"},
-	{"15", "dark:bg-violet-950 bg-violet-50"},
+	{"4", "dark:bg-emerald-950 bg-emerald-50 font-semibold"},
+	{"5", "dark:bg-green-950 bg-green-50 font-semibold"},
+	{"6", "dark:bg-lime-950 bg-lime-50 font-semibold"},
+	{"7", "dark:bg-yellow-950 bg-yellow-50 font-semibold"},
+	{"8", "dark:bg-amber-950 bg-amber-50 font-bold"},
+	{"9", "dark:bg-orange-950 bg-orange-50 font-bold"},
+	{"10", "dark:bg-red-950 bg-red-50 font-bold"},
+	{"11", "dark:bg-rose-950 bg-rose-50 font-bold"},
+	{"12", "dark:bg-pink-950 bg-pink-50 font-extrabold"},
+	{"13", "dark:bg-fuchsia-950 bg-fuchsia-50 font-extrabold"},
+	{"14", "dark:bg-purple-950 bg-purple-50 font-extrabold"},
+	{"15", "dark:bg-violet-950 bg-violet-50 font-extrabold"},
 }
 
 templ IntelParagraph(line []string) {
@@ -50,7 +50,7 @@ templ annotatedWord(index int, part model.AnnotatedWord) {
 		data-word={ index }
 		data-annotations={ strings.Join(part.AnnotationIDs, ",") }
 		data-marked={ len(part.AnnotationIDs) }
-		class={ colorMatches[limitMatches(len(part.AnnotationIDs))].Color }
+		class={ "cursor-pointer italic " + colorMatches[limitMatches(len(part.AnnotationIDs))].Color }
 		data-keywords={ strings.Join(part.Keywords, ",") }
 		title={ "keywords: " +
 	strings.Join(part.Keywords, ", " ) }
