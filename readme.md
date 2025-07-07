@@ -6,7 +6,7 @@
 - [x] templ as a react replacement
 - [x] go backend
 - [x] htmx to extend html
-- [ ] probably tailwind or maybe not?
+- [x] tailwind
 - [ ] maybe typescript or jsdoc as a ts replacement
 - [ ] maybe air for hot reloading
 
@@ -29,6 +29,12 @@ You can run the code with and get a development server on port 3000:
 
 ```bash
 go tool templ generate && go run .
+```
+
+Also for now you need to run this for tailwind:
+
+```bash
+npx @tailwindcss/cli -i ./src.css -o ./dist/under_the_fold.css --watch
 ```
 
 ## build

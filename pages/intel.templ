@@ -1,11 +1,13 @@
 package pages
 
 import (
-	"github.com/xintamosaik/vc29/components"
+"github.com/xintamosaik/vc29/components"
 )
 templ Intel() {
+<section class="hidden">
 	@components.Link("/intel/new", "Add new intel")
-	<br/>
-	<br/>
-	<div hx-trigger="load" hx-get="/intel/list"  hx-swap="outerHTML"></div>
+	<br />
+	<br />
+	<div hx-trigger="load" hx-get="/intel/list" hx-swap="outerHTML"></div>
+</section>
 }

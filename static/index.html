@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
     <title>VC29</title>
-    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
+    
  
     <link href="above_the_fold.css" rel="stylesheet">
     <style>
@@ -18,14 +18,18 @@
 
 <body>
     <nav class="navigation main" id="main_navigation" onclick="setActive(event)">
-        <a hx-get="/home" hx-swap="innerHTML" hx-target="#root" class="active">Home</a>
-        <a hx-get="/intel" hx-swap="innerHTML" hx-target="#root">Intel</a>
-        <a hx-get="/signals" hx-swap="innerHTML" hx-target="#root">Signals</a>
-        <a hx-get="/drafts" hx-swap="innerHTML" hx-target="#root">Drafts</a>
+        <a data-reference="home">Home</a>
+        <a data-reference="intel">Intel</a>
+        <a data-reference="signals">Signals</a>
+        <a data-reference="drafts">Drafts</a>
     </nav>
 
     <main>
-        <div id="root" hx-trigger="load" hx-get="/home" hx-swap="innerHTML"></div>
+        <h1>Home</h1>
+            <p>
+            Welcome to our web application! This is the home page where you can find the latest updates and features.
+            </p>
+        <div id="root" hx-trigger="load" hx-get="/under_the_fold" hx-swap="innerHTML"></div>
     </main>
 
     <script>
@@ -36,11 +40,12 @@
     <script>
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = './src/output.css';
+        link.href = './dist/under_the_fold.css';
         document.head.appendChild(link);
     </script>
 
-    <script src="dist.js" defer> </script>
+    <script src="dist/under_the_fold.js" defer> </script>
+    <script src="htmx.min.js" defer></script>
 </body>
 
 </html>

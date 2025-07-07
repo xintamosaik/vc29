@@ -29,7 +29,7 @@ func init() {
 	result := api.Build(api.BuildOptions{
 
 		EntryPoints:       []string{"src.js"},
-		Outfile:           "dist.js",
+		Outfile:           "dist/under_the_fold.js",
 		Bundle:            true,
 		Write:             true,
 		LogLevel:          api.LogLevelInfo,
@@ -51,29 +51,14 @@ func init() {
 func main() {
 
 	// just serve the static folder 
-	fs := http.FileServer(http.Dir("static"))
-	http.Handle("/", fs)
+	static:= http.FileServer(http.Dir("static"))
+	http.Handle("/", static)
 
-	// Static files: html
-	// http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	//	http.ServeFile(w, r, "index.html")
-	//})
-
-	// Static files: js bundle
-	http.HandleFunc("GET /dist.js", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "dist.js")
-	})
-
-	// Static files: css bundle
-	http.HandleFunc("GET /src/output.css", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "src/output.css")
-	})
-
-	// Static files: css bundle
-	http.HandleFunc("GET /dist.css", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "dist.css")
-	})
-
+	// And the dist folder 
+	dist := http.FileServer(http.Dir("dist"))
+	http.Handle("/dist/", http.StripPrefix("/dist/", dist))
+	
+	http.Handle("GET /under_the_fold", templ.Handler(under_the_fold()))
 	http.Handle("GET /home", templ.Handler(pages.Home()))
 	http.Handle("GET /intel", templ.Handler(pages.Intel()))
 	http.Handle("GET /intel/new", templ.Handler(pages.New()))
