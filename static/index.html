@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
     <title>VC29</title>
-    
- 
+
+
     <link href="above_the_fold.css" rel="stylesheet">
     <style>
 
@@ -25,18 +25,22 @@
     </nav>
 
     <main>
-        <h1>Home</h1>
+        <section class="main" id="home">
+            <h1>Home</h1>
             <p>
-            Welcome to our web application! This is the home page where you can find the latest updates and features.
+                Welcome to our web application! This is the home page where you can find the latest updates and
+                features.
             </p>
-        <div id="root" hx-trigger="load" hx-get="/under_the_fold" hx-swap="innerHTML"></div>
+        </section>
+
+        <div hx-trigger="load" hx-get="/under_the_fold" hx-swap="outerHTML"></div>
     </main>
 
     <script>
-       
+
     </script>
     <script src="above_the_fold.js" async></script>
-    
+
     <script>
         const link = document.createElement('link');
         link.rel = 'stylesheet';
