@@ -1,9 +1,9 @@
 package pages
+
 import (
+	"github.com/xintamosaik/vc29/model"
 	"strconv"
 	"time"
-	"github.com/xintamosaik/vc29/components"
-	"github.com/xintamosaik/vc29/model"
 )
 
 // stampToDate converts a timestamp string to a formatted date string.
@@ -25,9 +25,10 @@ func stampToDate(fileNameOnly string) (string, error) {
 }
 
 templ IntelList(intel []model.IntelShort) {
+	<div id="intel_list" class="flex flex-col gap-16">
 	for _, item := range intel {
-		<div id="intel_list">
-			<div class="item">
+		
+			<div class="flex content-stretch hover:outline outline-offset-8">
 				<div class="short">
 					<h2>
 						{ item.Title }
@@ -39,12 +40,13 @@ templ IntelList(intel []model.IntelShort) {
 						{ stampToDate(item.CreatedAt) }
 					</p>
 				</div>
-				<div class="actions">
-					@components.Link("/intel/view/" + item.CreatedAt, "view")
-                    @components.Link("/intel/annotate/" + item.CreatedAt, "annotate")
-                    @components.Link("/intel/delete/" + item.CreatedAt, "delete")
+				<div class="flex flex-grow-1 flex-col items-stretch gap-4">
+					<a class="text-right block flex-grow-1 cursor-pointer no-underline uppercase hover:underline" hx-get={ "/intel/view/" + item.CreatedAt } hx-swap="innerHTML" hx-target="#root">view</a>
+					<a class="text-right block flex-grow-1 cursor-pointer no-underline uppercase hover:underline" hx-get={ "/intel/annotate/" + item.CreatedAt } hx-swap="innerHTML" hx-target="#root">annotate</a>
+					<a class="text-right block flex-grow-1 cursor-pointer no-underline uppercase hover:underline" hx-get={ "/intel/delete/" + item.CreatedAt } hx-swap="innerHTML" hx-target="#root">delete</a>
 				</div>
 			</div>
-		</div>
+	
 	}
+	</div>
 }
