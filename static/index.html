@@ -29,23 +29,14 @@
         </section>
 
         <!-- this marks the "fold" -->
-
+         
+        <link href="dist/under_the_fold.css" rel="stylesheet" media="screen">
+        <script src="dist/under_the_fold.js" type="text/javascript" defer> </script>
         <div hx-trigger="load" hx-get="/under_the_fold" hx-swap="outerHTML"></div>
     </main>
 
-    <script>
 
-    </script>
     <script src="above_the_fold.js" type="text/javascript" async></script>
-
-    <script>
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = './dist/under_the_fold.css';
-        document.head.appendChild(link);
-    </script>
-
-    <script src="dist/under_the_fold.js" type="text/javascript" defer> </script>
     <script src="htmx.min.js" type="text/javascript" defer></script>
 </body>
 
