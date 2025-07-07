@@ -12,9 +12,9 @@ window.handleAnnotateMouseUp = AnnotationScript;
         }
         links.forEach(link => {
             if (link === event.target) {
-                link.classList.add('active');
+                link.classList.add('nav-active')
             } else {
-                link.classList.remove('active');
+                link.classList.remove('nav-active');
             }
         });
     }

@@ -1,10 +1,21 @@
 @import "tailwindcss";
-@import './styles.forms.css';
-@import './styles.colors.css';
-@import './styles.navigation.css';
-@import './pages/intel.css';
+
 @import './pages/annotate.css';
 
 * {
     box-sizing: border-box;
+}
+
+@media (prefers-color-scheme: dark) {
+    .nav-active {
+        background-color: white;
+        color: black
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    .nav-active {
+        background-color: black;
+        color: white
+    }
 }

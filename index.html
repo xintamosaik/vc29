@@ -14,11 +14,11 @@
 
 <body class="bg-white dark:bg-black text-black dark:text-white font-sans">
 
-    <nav class="navigation main" id="main_navigation" onclick="setActive(event)">
-        <a hx-get="/home" hx-swap="innerHTML" hx-target="#root" class="active">Home</a>
-        <a hx-get="/intel" hx-swap="innerHTML" hx-target="#root" >Intel</a>
-        <a hx-get="/signals" hx-swap="innerHTML" hx-target="#root">Signals</a>
-        <a hx-get="/drafts" hx-swap="innerHTML" hx-target="#root">Drafts</a>
+    <nav class="navigation main flex content-center flex-wrap mb-16" id="main_navigation" onclick="setActive(event)">
+        <a class="no-underline uppercase p-8 cursor-pointer border border-transparent text-black dark:text-white hover: border-black dark:border-white active:bg-cyan-500" hx-get="/home" hx-swap="innerHTML" hx-target="#root" class="active">Home</a>
+        <a class="no-underline uppercase p-8 cursor-pointer border border-transparent text-black dark:text-white hover: border-black dark:border-white" hx-get="/intel" hx-swap="innerHTML" hx-target="#root" >Intel</a>
+        <a class="no-underline uppercase p-8 cursor-pointer border border-transparent text-black dark:text-white hover: border-black dark:border-white" hx-get="/signals" hx-swap="innerHTML" hx-target="#root">Signals</a>
+        <a class="no-underline uppercase p-8 cursor-pointer border border-transparent text-black dark:text-white hover: border-black dark:border-white" hx-get="/drafts" hx-swap="innerHTML" hx-target="#root">Drafts</a>
     </nav>
 
     <main class="flex flex-col items-center">
