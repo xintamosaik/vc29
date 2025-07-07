@@ -1,3 +1,4 @@
+@import "tailwindcss";
 @import './styles.forms.css';
 @import './styles.colors.css';
 @import './styles.navigation.css';

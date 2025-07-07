@@ -61,6 +61,12 @@ func main() {
 	})
 
 	// Static files: css bundle
+	http.HandleFunc("GET /src/output.css", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "src/output.css")
+	})
+
+
+	// Static files: css bundle
 	http.HandleFunc("GET /dist.css", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "dist.css")
 	})

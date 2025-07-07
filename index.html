@@ -7,12 +7,12 @@
     <meta name="color-scheme" content="light dark">
     <title>VC29</title>
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
+    <link href="./src/output.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="dist.css">
 
 </head>
 
-<body style="background-color: var(--color-background); color: var(--color-primary); font-family: sans-serif;">
+<body class="bg-white dark:bg-black text-black dark:text-white font-sans">
 
     <nav class="navigation main" id="main_navigation" onclick="setActive(event)">
         <a hx-get="/home" hx-swap="innerHTML" hx-target="#root" class="active">Home</a>
