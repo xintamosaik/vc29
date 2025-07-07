@@ -1,8 +1,8 @@
 package pages
 
 import (
-	"strings"
 	"github.com/xintamosaik/vc29/model"
+	"strings"
 )
 
 templ IntelParagraph(line []string) {
@@ -17,7 +17,8 @@ templ annotatedWord(index int, part model.AnnotatedWord) {
 		data-annotations={ strings.Join(part.AnnotationIDs, ",") }
 		data-marked={ len(part.AnnotationIDs) }
 		data-keywords={ strings.Join(part.Keywords, ",") }
-		title={ "keywords: " + strings.Join(part.Keywords, ", ") }
+		title={ "keywords: " +
+	strings.Join(part.Keywords, ", " ) }
 	>
 		{ part.Word + " " }
 	</span>
@@ -92,7 +93,7 @@ templ Annotate(annotations []model.Annotation, annotatedIntel model.AnnotatedInt
 			</div>
 		}
 	</div>
-	<div id="send_annotation" popover>
+	<div id="send_annotation" class="w-[64ch] max-w-full p-4"popover>
 		<form hx-target="#root" hx-swap="innerHTML" hx-post={ "/intel/annotate/" + annotatedIntel.CreatedAt }>
 			<h2>Add Annotation</h2>
 			<br/>
