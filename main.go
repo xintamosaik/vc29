@@ -50,16 +50,16 @@ func init() {
 
 func main() {
 
-	// just serve the static folder 
+	// just serve the static folder (above the fold)
 	static:= http.FileServer(http.Dir("static"))
 	http.Handle("/", static)
 
-	// And the dist folder 
+	// And the dist folder (under the fold)
 	dist := http.FileServer(http.Dir("dist"))
 	http.Handle("/dist/", http.StripPrefix("/dist/", dist))
-	
 	http.Handle("GET /under_the_fold", templ.Handler(under_the_fold()))
-	
+
+	// Endpoints for features
 	http.Handle("GET /intel/new", templ.Handler(pages.New()))
 	http.HandleFunc("GET /intel/list", HandleIntelIndex)
 	http.HandleFunc("POST /intel/create", HandleNewIntel)
