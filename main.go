@@ -50,10 +50,14 @@ func init() {
 
 func main() {
 
+	// just serve the static folder 
+	fs := http.FileServer(http.Dir("static"))
+	http.Handle("/", fs)
+
 	// Static files: html
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "index.html")
-	})
+	// http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	//	http.ServeFile(w, r, "index.html")
+	//})
 
 	// Static files: js bundle
 	http.HandleFunc("GET /dist.js", func(w http.ResponseWriter, r *http.Request) {
@@ -64,7 +68,6 @@ func main() {
 	http.HandleFunc("GET /src/output.css", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "src/output.css")
 	})
-
 
 	// Static files: css bundle
 	http.HandleFunc("GET /dist.css", func(w http.ResponseWriter, r *http.Request) {
