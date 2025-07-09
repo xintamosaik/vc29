@@ -1,0 +1,23 @@
+package components
+
+type link struct {
+	href  string
+	label string
+}
+
+var links = []link{
+	{"/home.html", "home"},
+	{"/intel.html", "intel"},
+	{"/signals.html", "signals"},
+	{"/drafts.html", "drafts"},
+}
+
+templ Navigation(active string) {
+	<nav class="navigation main" id="main_navigation">
+		for _, link := range links {
+			<li>
+				<a href={ link.href }>{ link.label }</a>
+			</li>
+		}
+	</nav>
+}

@@ -1,7 +1,11 @@
 package pages
-
+import (
+    "vc29/internal/components"
+)
 templ Home() {
+@components.Navigation("home")
 <section id="home" class="main">
+ 
     <h2>Home</h2>
     <p>
         Welcome to our web application! This is the home page where you can find the latest updates and
