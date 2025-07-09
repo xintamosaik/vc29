@@ -10,19 +10,12 @@ templ Frame(title string, contents templ.Component){
     <meta name="color-scheme" content="light dark">
     <title>{ title }</title>
     <meta name="description" content="A web application with dynamic navigation and content loading.">
-
+    <script src="htmx.min.js" type="text/javascript" defer></script>
     <link href="above_the_fold.css" rel="stylesheet" media="screen">
 </head>
 
 <body style=" display: flex; flex-direction: column; align-items: center;">
     @contents
-    <link href="dist/under_the_fold.css" rel="stylesheet" media="screen">
-    <script src="dist/under_the_fold.js" type="text/javascript" defer> </script>
-
-
-    <script src="above_the_fold.js" type="text/javascript" async></script>
-    <script src="htmx.min.js" type="text/javascript" defer></script>
 </body>
-
 </html>
 }
