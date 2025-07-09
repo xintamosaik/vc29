@@ -14,8 +14,8 @@ import (
 	"github.com/a-h/templ"
 	"github.com/evanw/esbuild/pkg/api"
 
-	"github.com/xintamosaik/vc29/model"
-	"github.com/xintamosaik/vc29/pages"
+	"vc29/model"
+	"vc29/pages"
 )
 
 const port = ":3000"
@@ -51,7 +51,7 @@ func init() {
 func main() {
 
 	// just serve the static folder (above the fold)
-	static:= http.FileServer(http.Dir("static"))
+	static := http.FileServer(http.Dir("static"))
 	http.Handle("/", static)
 
 	// And the dist folder (under the fold)

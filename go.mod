@@ -1,4 +1,4 @@
-module github.com/xintamosaik/vc29
+module vc29
 
 go 1.24.4
 
