@@ -14,8 +14,9 @@ import (
 	"github.com/a-h/templ"
 	"github.com/evanw/esbuild/pkg/api"
 
-	"vc29/model"
-	"vc29/pages"
+	"vc29/internal/model"
+	"vc29/internal/pages"
+	"vc29/internal/layouts"
 )
 
 const port = ":3000"
@@ -57,7 +58,7 @@ func main() {
 	// And the dist folder (under the fold)
 	dist := http.FileServer(http.Dir("dist"))
 	http.Handle("/dist/", http.StripPrefix("/dist/", dist))
-	http.Handle("GET /under_the_fold", templ.Handler(under_the_fold()))
+	http.Handle("GET /under_the_fold", templ.Handler(layouts.Under_the_fold()))
 
 	// Endpoints for features
 	http.Handle("GET /intel/new", templ.Handler(pages.New()))

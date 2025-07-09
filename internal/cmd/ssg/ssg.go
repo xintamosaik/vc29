@@ -5,7 +5,7 @@ import (
 	"path"
 	"os"
 
-	"vc29/pages"
+	"vc29/internal/pages"
 )
 func main() {
 	staticPath := "static"
