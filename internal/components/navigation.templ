@@ -11,13 +11,20 @@ var links = []link{
 	{"/signals.html", "signals"},
 	{"/drafts.html", "drafts"},
 }
-
+templ linkClickable(href, label string) {
+	<a style="text-transform: uppercase; padding: 2rem; text-decoration: none; " href={ href }>{ label }</a>
+}
+templ linkClicked(label string) {
+	<span style="text-transform: uppercase; padding: 2rem;">{ label }</span>
+}
 templ Navigation(active string) {
-	<nav class="navigation main" id="main_navigation">
+	<nav style="display: flex; justify-content: center; flex-wrap: wrap;">
 		for _, link := range links {
-			<li>
-				<a href={ link.href }>{ link.label }</a>
-			</li>
+			if active == link.label {
+				@linkClicked(link.label)
+			} else {
+				@linkClickable(link.href, link.label)
+			}
 		}
 	</nav>
 }

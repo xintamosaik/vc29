@@ -1,8 +1,8 @@
 package layouts
 
-templ Frame(title  string, contents templ.Component){
+templ Frame(title string, contents templ.Component){
 
-<html lang="en">
+<html lang="en" style="font-family: sans-serif;">
 
 <head>
     <meta charset="UTF-8">
@@ -14,19 +14,11 @@ templ Frame(title  string, contents templ.Component){
     <link href="above_the_fold.css" rel="stylesheet" media="screen">
 </head>
 
-<body>
-  
+<body style=" display: flex; flex-direction: column; align-items: center;">
     @contents
-    <main>
-    
-
-        <!-- this marks the "fold" -->
-         
-     
-    </main>
-   <link href="dist/under_the_fold.css" rel="stylesheet" media="screen">
+    <link href="dist/under_the_fold.css" rel="stylesheet" media="screen">
     <script src="dist/under_the_fold.js" type="text/javascript" defer> </script>
-    <div hx-trigger="load" hx-get="/under_the_fold" hx-swap="outerHTML"></div>
+
 
     <script src="above_the_fold.js" type="text/javascript" async></script>
     <script src="htmx.min.js" type="text/javascript" defer></script>

@@ -31,15 +31,15 @@ func main() {
 	
 	for _, page := range mainPages {
 		fileHome := path.Join(staticPath, page.filename)
-		f, err := os.Create(fileHome)
+		file, err := os.Create(fileHome)
 		if err != nil {
 			log.Fatalf("failed to create output file: %v", err)
 		}
-
+		file.WriteString("<!DOCTYPE html>")
 		// Write it out.
 		navigation := components.Navigation(page.slug)
 		body := layouts.Body( navigation, page.templComponent)
-		err = layouts.Frame("VC29 | home", body).Render(context.Background(), f)
+		err = layouts.Frame("VC29 | home", body).Render(context.Background(), file)
 		if err != nil {
 			log.Fatalf("failed to write index page: %v", err)
 		}
