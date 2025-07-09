@@ -39,7 +39,7 @@ func main() {
 		// Write it out.
 		navigation := components.Navigation(page.slug)
 		body := layouts.Body( navigation, page.templComponent)
-		err = layouts.Frame("VC29 | home", body).Render(context.Background(), file)
+		err = layouts.Frame("VC29 | " + page.slug, body).Render(context.Background(), file)
 		if err != nil {
 			log.Fatalf("failed to write index page: %v", err)
 		}
