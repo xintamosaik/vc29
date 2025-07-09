@@ -20,7 +20,7 @@ type mainPage struct {
 }
 
 var mainPages = []mainPage{
-	{"home", "home.html", pages.Home()},
+	{"home", "index.html", pages.Home()},
 	{"intel", "intel.html", pages.Intel()},
 	{"signals", "signals.html", pages.Signals()},
 	{"drafts", "drafts.html", pages.Drafts()},
