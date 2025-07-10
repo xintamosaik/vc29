@@ -1,20 +1,22 @@
 package components
 
 templ New() {
-	<h2>Add New Intel</h2>
-    <p>
-        This is the form to add new intel to our web application. Please fill out the necessary details and submit.
-    </p>
-    <form action="/intel/create" method="post" hx-target="#root" hx-swap="innerHTML" hx-trigger="submit" hx-post="/intel/create">
+<dialog open style="width: min(64ch, 100%);">
+    <form action="/intel/create" method="post" hx-target="this" hx-swap="innerHTML" hx-trigger="submit"
+        hx-post="/intel/create" style="display: flex; flex-direction: column;">
         <label for="title">Title:</label>
+        <br />
         <input type="text" id="title" name="title" required>
         <br />
         <label for="description">Description:</label>
-        <textarea id="description" name="description" rows="8" required></textarea>  
+        <br />
+        <textarea id="description" name="description" rows="4" required style="field-sizing: content;"></textarea>
         <br />
         <label for="content">Content:</label>
-        <textarea id="content" name="content" rows="16" required></textarea>
+        <br />
+        <textarea id="content" name="content" rows="4" required style="field-sizing: content;"></textarea>
         <br />
         <button type="submit">Submit</button>
     </form>
+</dialog>
 }
