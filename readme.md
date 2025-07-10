@@ -6,7 +6,7 @@
 - [x] templ as a react replacement
 - [x] go backend
 - [x] htmx to extend html
-- [x] tailwind
+- [ ] maybe tailwind
 - [ ] maybe typescript or jsdoc as a ts replacement
 - [ ] maybe air for hot reloading
 
