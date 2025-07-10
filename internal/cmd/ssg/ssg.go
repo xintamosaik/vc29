@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 	"path"
-
+	esbuild "github.com/evanw/esbuild/pkg/api"
 	"vc29/internal/components"
 	"vc29/internal/layouts"
 	"vc29/internal/pages"
@@ -45,4 +45,26 @@ func main() {
 		}
 	}
 
+
+	// Bundle the JavaScript and CSS files using esbuild
+	result := esbuild.Build(esbuild.BuildOptions{
+
+		EntryPoints:       []string{"src.js"},
+		Outfile:           "dist/under_the_fold.js",
+		Bundle:            true,
+		Write:             true,
+		LogLevel:          esbuild.LogLevelInfo,
+		Format:            esbuild.FormatIIFE,
+		Platform:          esbuild.PlatformBrowser,
+		MinifyWhitespace:  false, // for dev builds - change later
+		MinifyIdentifiers: false, // for dev builds - change later
+		MinifySyntax:      false, // for dev builds - change later
+		Loader: map[string]esbuild.Loader{
+			".css": esbuild.LoaderCSS,
+		},
+	})
+
+	if len(result.Errors) > 0 {
+		os.Exit(1)
+	}
 }

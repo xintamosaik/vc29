@@ -12,10 +12,10 @@ import (
 	"time"
 
 	"github.com/a-h/templ"
-	"github.com/evanw/esbuild/pkg/api"
 
 	"vc29/internal/model"
-	"vc29/internal/pages"
+
+	"vc29/internal/components"
 )
 
 const port = ":3000"
@@ -25,27 +25,6 @@ func init() {
 		log.Fatalf("Failed to create data directory: %v", err)
 	}
 
-	// Bundle the JavaScript and CSS files using esbuild
-	result := api.Build(api.BuildOptions{
-
-		EntryPoints:       []string{"src.js"},
-		Outfile:           "dist/under_the_fold.js",
-		Bundle:            true,
-		Write:             true,
-		LogLevel:          api.LogLevelInfo,
-		Format:            api.FormatIIFE,
-		Platform:          api.PlatformBrowser,
-		MinifyWhitespace:  false, // for dev builds - change later
-		MinifyIdentifiers: false, // for dev builds - change later
-		MinifySyntax:      false, // for dev builds - change later
-		Loader: map[string]api.Loader{
-			".css": api.LoaderCSS,
-		},
-	})
-
-	if len(result.Errors) > 0 {
-		os.Exit(1)
-	}
 }
 
 func main() {
@@ -59,7 +38,7 @@ func main() {
 	http.Handle("/dist/", http.StripPrefix("/dist/", dist))
 
 	// Endpoints for features
-	http.Handle("GET /intel/new", templ.Handler(pages.New()))
+	http.Handle("GET /intel/new", templ.Handler(components.New()))
 	http.HandleFunc("GET /intel/list", HandleIntelIndex)
 	http.HandleFunc("POST /intel/create", HandleNewIntel)
 	http.HandleFunc("GET /intel/annotate/{id}", HandleAnnotate)
@@ -114,7 +93,7 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = pages.IntelList(intelShorts).Render(context.Background(), w)
+	err = components.IntelList(intelShorts).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render intel page", http.StatusInternalServerError)
 		log.Println("Error rendering intel page:", err)
@@ -139,7 +118,7 @@ func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = pages.IntelList(intelShorts).Render(context.Background(), w)
+	err = components.IntelList(intelShorts).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render intel page", http.StatusInternalServerError)
 		log.Println("Error rendering intel page:", err)
@@ -172,7 +151,7 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error getting annotated intel:", err)
 		return
 	}
-	err = pages.Annotate(ann, annotatedIntel).Render(context.Background(), w)
+	err = components.Annotate(ann, annotatedIntel).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
 		log.Println("Error rendering annotation page:", err)
@@ -231,7 +210,7 @@ func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = pages.Annotate(ann, annotatedIntel).Render(context.Background(), w)
+	err = components.Annotate(ann, annotatedIntel).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
 		log.Println("Error rendering annotation page:", err)
