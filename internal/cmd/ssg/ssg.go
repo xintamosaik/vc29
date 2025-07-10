@@ -49,7 +49,7 @@ func main() {
 	// Bundle the JavaScript and CSS files using esbuild
 	result := esbuild.Build(esbuild.BuildOptions{
 
-		EntryPoints:       []string{"src.js"},
+		EntryPoints:       []string{"internal/src.js"},
 		Outfile:           "dist/under_the_fold.js",
 		Bundle:            true,
 		Write:             true,
