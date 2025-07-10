@@ -1,7 +1,8 @@
 package components
 
 templ New() {
-<dialog open style="width: min(64ch, 100%);">
+<input type="button" popovertarget="new_intel" popovertargetaction="open" value="add new Intel" />
+<div id="new_intel" style="width: min(64ch, 100%);" popover>
     <form action="/intel/create" method="post" hx-target="this" hx-swap="innerHTML" hx-trigger="submit"
         hx-post="/intel/create" style="display: flex; flex-direction: column;">
         <label for="title">Title:</label>
@@ -16,7 +17,11 @@ templ New() {
         <br />
         <textarea id="content" name="content" rows="4" required style="field-sizing: content;"></textarea>
         <br />
-        <button type="submit">Submit</button>
+        <div style="display: flex; justify-content: space-between;">
+            <input type="button" popovertarget="new_intel" popovertargetaction="close" value="Close" />
+            <input type="submit" value="Submit" />
+        </div>
     </form>
-</dialog>
+
+</div>
 }

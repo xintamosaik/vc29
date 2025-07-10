@@ -4,11 +4,9 @@ import (
 "vc29/internal/components"
 )
 templ Intel() {
-	@components.Link("/intel/new", "Add new intel")
 	<br />
+	<br />
+	@components.New()
 	<br />
 	<div hx-trigger="load" hx-get="/intel/list" hx-swap="outerHTML"></div>
-
-	@components.New()
-
 }
