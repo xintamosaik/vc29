@@ -30,7 +30,6 @@ For styles there are a couple of ways to game lighthouse metrics but to make sty
 
 ### prefetch-ing
 
-
 ## workarounds (unplanned features)
 
 - [x] esbuild to bundle js and css
