@@ -2,19 +2,16 @@ package main
 
 import (
 	"context"
-
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
-
 	"time"
 
 	"github.com/a-h/templ"
 
 	"vc29/internal/model"
-
 	"vc29/internal/components"
 )
 
@@ -24,7 +21,6 @@ func init() {
 	if err := os.MkdirAll("data", 0755); err != nil {
 		log.Fatalf("Failed to create data directory: %v", err)
 	}
-
 }
 
 func main() {
@@ -68,8 +64,6 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("New intel submitted")
-
 	// Process form data
 	title := r.FormValue("title")
 	description := r.FormValue("description")
@@ -108,9 +102,6 @@ func HandleNewIntel(w http.ResponseWriter, r *http.Request) {
 //
 // If an error occurs during reading or rendering, it responds with an error message.
 func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
-
-	log.Println("Handling Intel index page")
-
 	intelShorts, err := model.GetAllIntelShorts()
 	if err != nil {
 		http.Error(w, "Failed to r ead intel files", http.StatusInternalServerError)
@@ -128,7 +119,6 @@ func HandleIntelIndex(w http.ResponseWriter, r *http.Request) {
 
 // handleAnnotate is a view that gets an intel data and then allows users to add annotations to it.
 func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
-	log.Println("Handling Intel annotation")
 
 	intelID := r.PathValue("id")
 
@@ -143,27 +133,23 @@ func HandleAnnotate(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error reading annotations:", err)
 		return
 	}
-	log.Println("Annotations loaded successfully for Intel ID:", intelID)
-	log.Println("Number of annotations:", len(ann))
+
 	annotatedIntel, err := model.GetAnnotatedIntel(intelID)
 	if err != nil {
 		http.Error(w, "Failed to get annotated intel", http.StatusInternalServerError)
 		log.Println("Error getting annotated intel:", err)
 		return
 	}
+
 	err = components.Annotate(ann, annotatedIntel).Render(context.Background(), w)
 	if err != nil {
 		http.Error(w, "Failed to render annotation page", http.StatusInternalServerError)
 		log.Println("Error rendering annotation page:", err)
 		return
 	}
-
-	log.Println("Intel annotation page rendered successfully")
 }
 
 func HandleNewAnnotation(w http.ResponseWriter, r *http.Request) {
-	log.Println("Handling new annotation submission")
-
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
