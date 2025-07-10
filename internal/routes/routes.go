@@ -23,14 +23,11 @@ func init() {
 }
 
 func Register() {
-
-	// Endpoints for features
 	http.Handle("GET /intel/new", templ.Handler(components.New()))
 	http.HandleFunc("GET /intel/list", HandleIntelIndex)
 	http.HandleFunc("POST /intel/create", HandleNewIntel)
 	http.HandleFunc("GET /intel/annotate/{id}", HandleAnnotate)
 	http.HandleFunc("POST /intel/annotate/{id}", HandleNewAnnotation)
-
 }
 
 // This function handles the submission of new intel data.
